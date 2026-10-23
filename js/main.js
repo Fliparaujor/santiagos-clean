@@ -1,7 +1,8 @@
 /* ==========================================================================
    Santiago's Clean · interações
-   GSAP + ScrollTrigger + SplitText para as animações e Lenis para a rolagem
-   suave. Tudo local, roda estático no GitHub Pages.
+   GSAP + ScrollTrigger para as animações e Lenis para a rolagem suave.
+   Tudo local, roda estático no GitHub Pages.
+   O gesto da página é a passada do bico extrator: da esquerda para a direita.
    ========================================================================== */
 (() => {
   const d = document.documentElement;
@@ -14,241 +15,150 @@
 
   /* sem viúvas: a última palavra de cada bloco de texto desce junto com a
      penúltima (espaço que não quebra entre as duas) */
-  function semViuvas() {
-    $$('p, li, h1 .line, h2, h3, figcaption, dd, legend, .svc-desc, .stack-text p').forEach(el => {
-      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-      const nodes = [];
-      while (walker.nextNode()) nodes.push(walker.currentNode);
-      for (let i = nodes.length - 1; i >= 0; i--) {
-        const t = nodes[i].nodeValue;
-        const trimmed = t.replace(/\s+$/, '');
-        const k = trimmed.lastIndexOf(' ');
-        if (k > 0) { nodes[i].nodeValue = trimmed.slice(0, k) + ' ' + trimmed.slice(k + 1) + t.slice(trimmed.length); break; }
-        if (trimmed.length && k === -1 && i > 0) {
-          // a última palavra está sozinha num nó (dentro de <em>): segura o espaço anterior
-          const prev = nodes[i - 1];
-          if (/ $/.test(prev.nodeValue)) { prev.nodeValue = prev.nodeValue.replace(/ $/, ' '); break; }
-        }
-        if (trimmed.length) break;
-      }
-    });
-  }
-  semViuvas();
-
-  /* nos títulos que viram linhas animadas, o espaço que não quebra se perde:
-     as duas últimas palavras vão juntas num bloco que não quebra */
-  $$('[data-split]').forEach(el => {
+  $$('p, li, h1, h2, h3, figcaption, .svc-desc, .etapa-nome').forEach(el => {
+    if (el.querySelector('p, li, h2, h3')) return;
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-    const pos = [];
-    while (walker.nextNode()) {
-      const n = walker.currentNode;
-      const re = /[^\s ]+/g;
-      let m;
-      while ((m = re.exec(n.nodeValue))) pos.push([n, m.index, m.index + m[0].length]);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const t = nodes[i].nodeValue;
+      const trimmed = t.replace(/\s+$/, '');
+      if (!trimmed.trim()) continue;
+      const k = trimmed.lastIndexOf(' ');
+      if (k > 0 && trimmed.slice(0, k).trim()) {
+        nodes[i].nodeValue = trimmed.slice(0, k) + ' ' + trimmed.slice(k + 1) + t.slice(trimmed.length);
+      } else if (i > 0 && / $/.test(nodes[i - 1].nodeValue)) {
+        nodes[i - 1].nodeValue = nodes[i - 1].nodeValue.replace(/ $/, ' ');
+      }
+      break;
     }
-    if (pos.length < 2) return;
-    const a = pos[pos.length - 2], z = pos[pos.length - 1];
-    const range = document.createRange();
-    range.setStart(a[0], a[1]);
-    range.setEnd(z[0], z[2]);
-    const span = document.createElement('span');
-    span.className = 'nw';
-    span.appendChild(range.extractContents());
-    range.insertNode(span);
   });
 
-  const hasGSAP = !!(window.gsap && window.ScrollTrigger && window.SplitText);
+  const hasGSAP = !!(window.gsap && window.ScrollTrigger);
   const motion = hasGSAP && d.classList.contains('motion');
-  const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   if (!motion) d.classList.remove('motion');
-  if (!hasGSAP) {
-    d.classList.add('ready', 'intro-done');
-    basics(null);
-    return;
-  }
+  basics();
+  if (!hasGSAP) { d.classList.add('ready'); return; }
 
-  gsap.registerPlugin(ScrollTrigger, SplitText);
+  gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({ ignoreMobileResize: true });
-  gsap.defaults({ ease: 'expo.out', duration: 1.1 });
+  gsap.defaults({ ease: 'power3.out', duration: 1 });
 
   /* ---------- rolagem suave ---------- */
   let lenis = null;
   if (motion && window.Lenis) {
-    lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.9, anchors: false });
+    lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.9, anchors: false });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(t => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
   }
+  window.__lenis = lenis;
 
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  const startHash = location.hash;
-  window.scrollTo(0, 0);
+  setupHeader();
+  setupCompare(motion);
+  setupComo(motion);
 
-  basics(lenis);
+  if (!motion) { d.classList.add('ready'); return; }
 
   const fontsReady = Promise.race([
     document.fonts ? document.fonts.ready : Promise.resolve(),
-    new Promise(r => setTimeout(r, 2500))
+    new Promise(r => setTimeout(r, 2000))
   ]);
-
   fontsReady.then(() => {
-    if (!motion) {
-      d.classList.add('ready', 'intro-done');
-      return;
-    }
-    const heroTl = setupHero();
-    setupBand();
-    setupAgua();
-    setupTitles();
-    setupStack();
-    setupCompare(true);
+    setupWipes();
     setupReveals();
-    setupGallery();
-    setupFooter();
-    setupHeader();
-    if (finePointer) { setupServiceFloat(); setupTrail(); setupMagnetic(); setupCursor(); }
+    setupParallax();
     ScrollTrigger.refresh();
     d.classList.add('ready');
-    runIntro(heroTl);
+    heroIntro();
   });
 
   /* ======================================================================
-     Abertura: o bico do extrator passa e deixa o tecido limpo.
+     Abertura: o bico passa na poltrona inteira, da sujeira para o limpo,
+     e volta para o meio. O título entra junto, na mesma direção.
      ====================================================================== */
-  function runIntro(heroTl) {
-    const seen = d.classList.contains('intro-seen');
-    const finish = () => {
-      d.classList.add('intro-done');
-      lenis && lenis.start();
-      if (startHash && startHash.length > 1 && $(startHash)) goTo(startHash, true);
-    };
-    if (seen) {
-      heroTl.play(0.25);
-      finish();
-      return;
-    }
-    try { sessionStorage.setItem('sc-intro', '1'); } catch (e) {}
-    lenis && lenis.stop();
-
-    const intro = $('.intro');
-    const tl = gsap.timeline({ onComplete: () => { intro.remove(); finish(); } });
-    tl.from('.intro-word', { yPercent: 18, opacity: 0, duration: 0.9, stagger: 0 }, 0.1)
-      .to('.intro-nozzle', { x: () => window.innerWidth + 40, xPercent: 0, duration: 1.25, ease: 'power2.inOut' }, 0.55)
-      .to('.intro-clean', { clipPath: 'inset(0 0% 0 0)', duration: 1.25, ease: 'power2.inOut' }, 0.55)
-      .to(intro, { clipPath: 'inset(0 0 100% 0)', duration: 1, ease: 'expo.inOut' }, 2)
-      .add(() => heroTl.play(0), 2.35);
+  function heroIntro() {
+    const fig = $('.compare-hero');
+    const st = { v: 100 };
+    fig._set(100);
+    const tl = gsap.timeline({ delay: 0.15 });
+    tl.fromTo('.hero-title', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 1.3, ease: 'power2.inOut' }, 0)
+      .to(st, { v: 0, duration: 1.5, ease: 'power2.inOut', onUpdate: () => fig._set(st.v) }, 0.1)
+      .to(st, { v: 50, duration: 0.9, ease: 'power3.out', onUpdate: () => fig._set(st.v) }, 1.7)
+      .from('.hero-lead, .hero-actions, .hero-who', { opacity: 0, y: 12, stagger: 0.08, duration: 0.7 }, 0.7);
   }
 
-  /* ======================================================================
-     Hero: título sobe linha a linha (SplitText, React Bits), a moldura do
-     vídeo abre como uma passada e o grifo amarelo corre sob a palavra.
-     ====================================================================== */
-  function setupHero() {
-    const title = $('.hero-title');
-    const split = SplitText.create(title.querySelectorAll('.line'), { type: 'lines', mask: 'lines', linesClass: 'ln' });
-    roomForAccents(split);
-    const tl = gsap.timeline({ paused: true });
-    tl.set('.hero-title .line, .hero-lead, .hero-actions, .hero-copy .eyebrow', { opacity: 1 })
-      .from(split.lines, { yPercent: 110, duration: 1.3, stagger: 0.12 }, 0)
-      .fromTo('.hero-frame', { clipPath: 'inset(0 100% 0 0 round 14px)' }, { clipPath: 'inset(0 0% 0 0 round 14px)', duration: 1.4, ease: 'expo.inOut' }, 0.05)
-      .from('.hero-video', { scale: 1.25, duration: 1.8 }, 0.05)
-      .fromTo('.mark', { '--mark': 0 }, { '--mark': 1, duration: 0.9, ease: 'power3.inOut' }, 0.75)
-      .from('.hero-copy .eyebrow, .hero-lead, .hero-actions', { y: 24, opacity: 0, stagger: 0.08 }, 0.35)
-      .from('.bubble', { scale: 0, opacity: 0, stagger: 0.12, duration: 1.2, ease: 'elastic.out(1, 0.6)' }, 0.9)
-      .from('.hero-facts li', { y: 20, opacity: 0, stagger: 0.06 }, 0.6);
-
-    // as bolhas flutuam e se afastam com a rolagem
-    $$('.bubble').forEach((b, i) => {
-      gsap.to(b, { y: -10 - i * 6, x: i % 2 ? 6 : -6, duration: 2.6 + i * 0.7, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-      gsap.to(b, { yPercent: -160 - i * 80, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  /* títulos entram com a passada, da esquerda para a direita */
+  function setupWipes() {
+    $$('[data-wipe]').forEach(el => {
+      if (el.classList.contains('hero-title')) return;
+      gsap.fromTo(el, { clipPath: 'inset(0 100% 0 0)' }, {
+        clipPath: 'inset(0 0% 0 0)', duration: 1.1, ease: 'power2.inOut',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
     });
-    gsap.to('.hero-frame', { yPercent: -6, rotate: -1.5, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-    return tl;
+  }
+
+  /* fotos abrem pela mesma passada; a foto assenta enquanto abre */
+  function setupReveals() {
+    $$('[data-reveal]').forEach(fig => {
+      const img = $('img', fig);
+      gsap.fromTo(fig, { clipPath: 'inset(0 100% 0 0)' }, {
+        clipPath: 'inset(0 0% 0 0)', duration: 1.2, ease: 'power2.inOut',
+        scrollTrigger: { trigger: fig, start: 'top 85%' }
+      });
+      gsap.fromTo(img, { scale: 1.15, xPercent: -4 }, {
+        scale: 1, xPercent: 0, duration: 1.6, ease: 'power3.out',
+        scrollTrigger: { trigger: fig, start: 'top 85%' }
+      });
+    });
+  }
+
+  /* movimentos que acompanham a rolagem */
+  function setupParallax() {
+    gsap.to('.em-b', { yPercent: -10, ease: 'none', scrollTrigger: { trigger: '.empresas', start: 'top bottom', end: 'bottom top', scrub: true } });
+    gsap.fromTo('.agua-video', { scale: 1.08 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.agua', start: 'top bottom', end: 'center center', scrub: true } });
+    $$('.svc-list li').forEach(li => {
+      gsap.fromTo(li, { clipPath: 'inset(0 100% 0 0)' }, {
+        clipPath: 'inset(0 0% 0 0)', duration: 0.9, ease: 'power2.inOut',
+        scrollTrigger: { trigger: li, start: 'top 92%' }
+      });
+    });
   }
 
   /* ======================================================================
-     Faixa: corre sozinha e acelera com a rolagem (ScrollVelocity, React Bits)
+     Cabeçalho: barra de progresso amarela e a seção ativa sublinhada
      ====================================================================== */
-  function setupBand() {
-    const track = $('.band-track');
-    const base = track.innerHTML;
-    track.innerHTML = base + base + base;
-    let x = 0, dir = -1, extra = 0;
-    const width = () => track.scrollWidth / 3;
+  function setupHeader() {
+    const header = $('#header');
+    const links = $$('.nav a');
+    const zap = $('.zap-fixo');
     ScrollTrigger.create({
       start: 0, end: 'max',
-      onUpdate: self => {
-        const v = self.getVelocity();
-        dir = v < 0 ? 1 : -1;
-        extra = Math.min(Math.abs(v) / 120, 14);
+      onUpdate(self) {
+        header.classList.toggle('is-scrolled', self.scroll() > 10);
+        gsap.set('.header-progress span', { scaleX: self.progress });
       }
     });
-    gsap.ticker.add((t, delta) => {
-      const w = width();
-      x += dir * (0.6 + extra) * (delta / 16.7);
-      extra *= 0.92;
-      if (x <= -w) x += w;
-      if (x > 0) x -= w;
-      track.style.transform = `translate3d(${x}px,0,0)`;
+    // o botão fixo aparece depois do topo e some no orçamento, onde já há um botão
+    ScrollTrigger.create({
+      trigger: '.hero', start: 'bottom 70%', endTrigger: '#orcamento', end: 'top 80%',
+      onToggle: self => zap.classList.toggle('is-visible', self.isActive)
     });
-  }
-
-  /* ======================================================================
-     A água: as palavras acendem conforme a rolagem (ScrollReveal, React Bits;
-     revelação por faixa de luz, Unlumen Dia Text Reveal)
-     ====================================================================== */
-  function setupAgua() {
-    const p = $('.agua-text');
-    const split = SplitText.create(p, { type: 'words', wordsClass: 'w' });
-    gsap.set(split.words, { opacity: 0.18 });
-    gsap.to(split.words, {
-      opacity: 1, ease: 'none',
-      stagger: { each: 0.1 },
-      scrollTrigger: { trigger: p, start: 'top 78%', end: 'bottom 40%', scrub: 0.6 }
-    });
-    gsap.from('.pill', { width: 0, duration: 1, scrollTrigger: { trigger: '.pill', start: 'top 80%' } });
-  }
-
-  /* a máscara das linhas cortava acentos (ê, ã) e o itálico: abre uma folga */
-  function roomForAccents(split) {
-    gsap.set(split.masks, { paddingTop: '0.16em', marginTop: '-0.16em', paddingBottom: '0.08em', marginBottom: '-0.08em', paddingRight: '0.08em', marginRight: '-0.08em' });
-  }
-
-  /* títulos das seções: linhas subindo de dentro de uma máscara */
-  function setupTitles() {
-    $$('[data-split]').forEach(el => {
-      const split = SplitText.create(el, { type: 'lines', mask: 'lines' });
-      roomForAccents(split);
-      gsap.from(split.lines, {
-        yPercent: 105, duration: 1.2, stagger: 0.1,
-        scrollTrigger: { trigger: el, start: 'top 85%' }
-      });
-    });
-    $$('.sec-lead, .empresas-copy > p, .quem-copy > p, .contato-copy > p, .contato-info > div').forEach(el => {
-      gsap.from(el, { y: 26, opacity: 0, duration: 1.1, scrollTrigger: { trigger: el, start: 'top 90%' } });
-    });
-  }
-
-  /* ======================================================================
-     Processo: cartões que se empilham e encolhem (ScrollStack, React Bits)
-     ====================================================================== */
-  function setupStack() {
-    const cards = $$('.stack-card');
-    cards.forEach((card, i) => {
-      card.style.top = `calc(var(--header) + env(safe-area-inset-top, 0px) + ${14 + i * 14}px)`;
-      const next = cards[i + 1];
-      if (!next) return;
-      gsap.to(card, {
-        scale: 0.94 - (cards.length - 2 - i) * 0.02, ease: 'none',
-        scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 30%', scrub: true }
+    links.forEach(a => {
+      const sec = $(a.getAttribute('href'));
+      if (!sec) return;
+      ScrollTrigger.create({
+        trigger: sec, start: 'top 45%', end: 'bottom 45%',
+        onToggle: self => a.classList.toggle('is-active', self.isActive)
       });
     });
   }
 
   /* ======================================================================
-     Antes e depois: arrastar para comparar; ao entrar na tela, a divisória
-     corre sozinha uma vez, como a passada do extrator.
+     Antes e depois: arrastar o bico; nas comparações de baixo, o bico corre
+     sozinho uma vez quando a foto entra na tela.
      ====================================================================== */
   function setupCompare(animate) {
     $$('.compare').forEach(fig => {
@@ -260,6 +170,7 @@
         fig.style.setProperty('--pos', v + '%');
         range.value = Math.round(v);
       };
+      fig._set = v => { if (!touched) set(v); };
       const fromEvent = e => {
         const r = box.getBoundingClientRect();
         set(((e.clientX - r.left) / r.width) * 100);
@@ -276,208 +187,79 @@
       box.addEventListener('pointercancel', stop);
       range.addEventListener('input', () => { touched = true; set(+range.value); });
 
-      if (animate) {
-        const state = { v: 100 };
+      if (animate && !fig.classList.contains('compare-hero')) {
+        const st = { v: 100 };
         set(100);
-        gsap.to(state, {
+        gsap.to(st, {
           v: 50, ease: 'none',
-          onUpdate: () => { if (!touched) set(state.v); },
-          scrollTrigger: { trigger: fig, start: 'top 85%', end: 'top 30%', scrub: 0.8 }
+          onUpdate: () => fig._set(st.v),
+          scrollTrigger: { trigger: fig, start: 'top 85%', end: 'top 35%', scrub: 0.6 }
         });
       }
     });
-  }
-
-  /* fotos que abrem por recorte, de baixo para cima (Details, Parallax Images) */
-  function setupReveals() {
-    $$('.reveal-clip').forEach(fig => {
-      const img = $('img', fig);
-      gsap.fromTo(fig, { clipPath: 'inset(100% 0% 0% 0% round 14px)' }, {
-        clipPath: 'inset(0% 0% 0% 0% round 14px)', duration: 1.5, ease: 'expo.inOut',
-        scrollTrigger: { trigger: fig, start: 'top 88%' }
-      });
-      gsap.fromTo(img, { scale: 1.3 }, { scale: 1, duration: 1.9, ease: 'expo.out', scrollTrigger: { trigger: fig, start: 'top 88%' } });
-    });
-    gsap.to('.em-b', { yPercent: -14, ease: 'none', scrollTrigger: { trigger: '.empresas', start: 'top bottom', end: 'bottom top', scrub: true } });
-    $$('.svc-list li').forEach((li, i) => {
-      gsap.from(li, { y: 40, opacity: 0, duration: 1, delay: (i % 3) * 0.05, scrollTrigger: { trigger: li, start: 'top 92%' } });
-    });
-    gsap.from('.pedido', { y: 60, opacity: 0, duration: 1.3, scrollTrigger: { trigger: '.pedido', start: 'top 88%' } });
-  }
-
-  /* galeria: colunas em velocidades diferentes */
-  function setupGallery() {
-    const cols = $$('.gal-col');
-    const speeds = [-6, -16, -4, -12];
-    cols.forEach((c, i) => {
-      gsap.to(c, { yPercent: speeds[i % speeds.length], ease: 'none', scrollTrigger: { trigger: '.gal', start: 'top bottom', end: 'bottom top', scrub: true } });
-      $$('img', c).forEach(img => {
-        gsap.fromTo(img, { clipPath: 'inset(100% 0 0 0 round 14px)' }, {
-          clipPath: 'inset(0% 0 0 0 round 14px)', duration: 1.4, ease: 'expo.inOut',
-          scrollTrigger: { trigger: img, start: 'top 92%' }
-        });
-      });
-    });
-  }
-
-  /* o nome no rodapé ocupa a largura exata */
-  function setupFooter() {
-    const el = $('.footer-name');
-    const span = $('span', el);
-    const fit = () => {
-      el.style.fontSize = '100px';
-      const w = el.clientWidth;
-      el.style.fontSize = (100 * w / span.offsetWidth) + 'px';
-    };
-    fit();
-    window.addEventListener('resize', fit);
-    gsap.from(span, { yPercent: 60, opacity: 0, duration: 1.4, scrollTrigger: { trigger: el, start: 'top 95%' } });
   }
 
   /* ======================================================================
-     Cabeçalho: barra de progresso e pílula que desliza até a seção ativa
-     (Unlumen, Motion Navigation)
+     Como é feito: a rolagem anda pelas 4 etapas; a barra de cada etapa
+     enche e o vídeo troca. Clicar numa etapa leva até ela.
      ====================================================================== */
-  function setupHeader() {
-    const header = $('#header');
-    const nav = $('.nav');
-    const indicator = $('.nav-indicator');
-    const links = $$('.nav a');
-    let active = null;
+  function setupComo(animate) {
+    const items = $$('.etapa');
+    const btns = $$('.etapa-btn');
+    const vids = $$('.como-media video');
+    const bars = $$('.etapa-barra span');
+    let current = -1;
+    const show = i => {
+      if (i === current) return;
+      current = i;
+      items.forEach((li, k) => li.classList.toggle('is-active', k === i));
+      vids.forEach((v, k) => {
+        v.classList.toggle('is-active', k === i);
+        if (k === i) { if (v.preload === 'none') v.preload = 'auto'; const p = v.play(); if (p) p.catch(() => {}); }
+        else v.pause();
+      });
+    };
+    show(0);
 
-    ScrollTrigger.create({
-      start: 0, end: 'max',
+    if (!animate) {
+      btns.forEach((b, i) => b.addEventListener('click', () => show(i)));
+      return;
+    }
+    const st = ScrollTrigger.create({
+      trigger: '.como-track', start: 'top top', end: 'bottom bottom',
       onUpdate(self) {
-        header.classList.toggle('is-scrolled', self.scroll() > 30);
-        gsap.set('.header-progress span', { scaleX: self.progress });
-      }
+        const p = self.progress * items.length;
+        const i = Math.min(items.length - 1, Math.floor(p));
+        show(i);
+        bars.forEach((b, k) => gsap.set(b, { scaleX: k < i ? 1 : k === i ? Math.min(1, p - i) : 0 }));
+      },
+      onLeave: () => vids.forEach(v => v.pause()),
+      onLeaveBack: () => vids.forEach(v => v.pause()),
+      onEnter: () => vids[current] && vids[current].play().catch(() => {}),
+      onEnterBack: () => vids[current] && vids[current].play().catch(() => {})
     });
-
-    const moveTo = a => {
-      if (!a) { indicator.style.opacity = 0; return; }
-      indicator.style.opacity = 1;
-      indicator.style.width = a.offsetWidth + 'px';
-      indicator.style.transform = `translateX(${a.offsetLeft}px)`;
-    };
-    const setActive = a => {
-      active = a;
-      links.forEach(l => l.classList.toggle('is-active', l === a));
-      moveTo(a);
-    };
-    links.forEach(a => {
-      const sec = $(a.getAttribute('href'));
-      if (!sec) return;
-      ScrollTrigger.create({
-        trigger: sec, start: 'top 45%', end: 'bottom 45%',
-        onToggle: self => {
-          if (self.isActive) setActive(a);
-          else if (active === a) setActive(null);
-        }
-      });
-    });
-    nav.addEventListener('mouseleave', () => moveTo(active));
-    window.addEventListener('resize', () => moveTo(active));
-  }
-
-  /* serviços: a foto segue o cursor (Unlumen Hover Image List, Skiper) */
-  function setupServiceFloat() {
-    const box = $('.svc-float');
-    const img = $('img', box);
-    const xTo = gsap.quickTo(box, 'x', { duration: 0.6, ease: 'power3' });
-    const yTo = gsap.quickTo(box, 'y', { duration: 0.6, ease: 'power3' });
-    const rTo = gsap.quickTo(box, 'rotate', { duration: 0.8, ease: 'power3' });
-    let lastX = 0;
-    $$('.svc').forEach(a => {
-      a.addEventListener('pointerenter', e => {
-        img.src = a.dataset.img;
-        gsap.set(box, { x: e.clientX - 120, y: e.clientY - 150 });
-        gsap.to(box, { opacity: 1, scale: 1, duration: 0.5, overwrite: 'auto' });
-      });
-      a.addEventListener('pointermove', e => {
-        xTo(e.clientX + 30); yTo(e.clientY - 150);
-        rTo(Math.max(-12, Math.min(12, (e.clientX - lastX) * 0.6)));
-        lastX = e.clientX;
-      });
-      a.addEventListener('pointerleave', () => gsap.to(box, { opacity: 0, scale: 0.6, duration: 0.4, overwrite: 'auto' }));
-    });
-  }
-
-  /* orçamento: rastro de fotos atrás do cursor (Unlumen Cursor Image Trail) */
-  function setupTrail() {
-    const sec = $('.contato');
-    const trail = $('.trail');
-    const srcs = ['g-floral', 'sv-poltronas', 'g-tapete', 'sv-sofa', 'g-colchao', 'ad-poltrona-depois', 'sv-cadeiras', 'g-retratil'];
-    const imgs = srcs.map(s => {
-      const im = new Image();
-      im.alt = '';
-      im.src = `assets/media/${s}.webp`;
-      trail.appendChild(im);
-      return im;
-    });
-    let i = 0, lx = 0, ly = 0;
-    sec.addEventListener('pointermove', e => {
-      if (e.target.closest('.pedido')) return;
-      const dx = e.clientX - lx, dy = e.clientY - ly;
-      if (Math.hypot(dx, dy) < 110) return;
-      lx = e.clientX; ly = e.clientY;
-      const r = sec.getBoundingClientRect();
-      const im = imgs[i++ % imgs.length];
-      gsap.killTweensOf(im);
-      gsap.set(im, { x: e.clientX - r.left - 75, y: e.clientY - r.top - 94, opacity: 1, scale: 0.6, rotate: gsap.utils.random(-10, 10), zIndex: i });
-      gsap.to(im, { scale: 1, duration: 0.5, ease: 'expo.out' });
-      gsap.to(im, { opacity: 0, y: '+=60', scale: 0.85, duration: 0.9, delay: 0.45, ease: 'power2.in' });
-    });
-  }
-
-  /* botões magnéticos (MicroKit, Magnetic Fill Button) */
-  function setupMagnetic() {
-    $$('[data-magnetic]').forEach(el => {
-      const xTo = gsap.quickTo(el, 'x', { duration: 0.8, ease: 'elastic.out(1, 0.4)' });
-      const yTo = gsap.quickTo(el, 'y', { duration: 0.8, ease: 'elastic.out(1, 0.4)' });
-      el.addEventListener('pointermove', e => {
-        const r = el.getBoundingClientRect();
-        xTo((e.clientX - (r.left + r.width / 2)) * 0.25);
-        yTo((e.clientY - (r.top + r.height / 2)) * 0.35);
-      });
-      el.addEventListener('pointerleave', () => { xTo(0); yTo(0); });
-    });
-  }
-
-  function setupCursor() {
-    const cursor = $('.cursor');
-    const label = $('.cursor-label');
-    d.classList.add('has-cursor');
-    const xTo = gsap.quickTo(cursor, 'x', { duration: 0.4, ease: 'power3' });
-    const yTo = gsap.quickTo(cursor, 'y', { duration: 0.4, ease: 'power3' });
-    let on = false;
-    window.addEventListener('pointermove', e => { xTo(e.clientX); yTo(e.clientY); }, { passive: true });
-    $$('[data-cursor]').forEach(el => {
-      el.addEventListener('pointerenter', e => {
-        label.textContent = el.dataset.cursor;
-        if (!on) gsap.set(cursor, { x: e.clientX, y: e.clientY });
-        on = true;
-        gsap.to(cursor, { scale: 1, opacity: 1, duration: 0.5, overwrite: 'auto' });
-      });
-      el.addEventListener('pointerleave', () => {
-        on = false;
-        gsap.to(cursor, { scale: 0, opacity: 0, duration: 0.35, ease: 'power2.in', overwrite: 'auto' });
-      });
-    });
+    btns.forEach((b, i) => b.addEventListener('click', () => {
+      const y = st.start + (st.end - st.start) * ((i + 0.35) / items.length);
+      if (lenis) lenis.scrollTo(y, { duration: 1.1 }); else window.scrollTo({ top: y, behavior: 'smooth' });
+    }));
   }
 
   /* ======================================================================
      O que precisa funcionar mesmo sem animação: âncoras, menu, vídeos,
-     comparador e o formulário do WhatsApp.
+     galeria e o formulário do WhatsApp.
      ====================================================================== */
-  function goTo(hash, instant) {
+  function goTo(hash) {
     const target = hash === '#inicio' ? 0 : $(hash);
     if (target === null) return;
-    if (lenis) lenis.scrollTo(target, { duration: instant ? 0 : 1.4, immediate: !!instant, offset: hash === '#inicio' ? 0 : -8 });
-    else if (target === 0) window.scrollTo({ top: 0, behavior: instant ? 'auto' : 'smooth' });
-    else target.scrollIntoView({ behavior: instant ? 'auto' : 'smooth' });
+    const l = window.__lenis;
+    if (l) l.scrollTo(target, { duration: 1.3, offset: hash === '#inicio' ? 0 : -64 });
+    else if (target === 0) window.scrollTo({ top: 0, behavior: 'smooth' });
+    else window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 64, behavior: 'smooth' });
   }
 
-  function basics(lenis) {
+  function basics() {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     /* âncoras; um serviço clicado já vem marcado no orçamento */
     document.addEventListener('click', e => {
       const a = e.target.closest('a[href^="#"]');
@@ -495,79 +277,74 @@
       if (hash === '#principal') $('#principal').focus({ preventScroll: true });
     });
 
-    /* menu do celular: camadas entram em sequência (StaggeredMenu, React Bits) */
+    /* menu do celular: folha que sobe de baixo */
     const toggle = $('.menu-toggle');
     const menu = $('#menu');
-    let menuTl = null;
     function toggleMenu(open) {
       d.classList.toggle('menu-open', open);
       toggle.setAttribute('aria-expanded', open);
-      toggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
       menu.setAttribute('aria-hidden', !open);
       menu.inert = !open;
-      if (lenis) open ? lenis.stop() : lenis.start();
-      const parts = $$('.menu-layer, .menu-panel', menu);
-      const links = $$('.menu-panel nav a, .menu-foot', menu);
-      if (menuTl) menuTl.kill();
-      if (!window.gsap) {
-        parts.forEach(p => { p.style.transform = open ? 'none' : ''; });
-        return;
-      }
-      if (open) {
-        menuTl = gsap.timeline()
-          .to(parts, { xPercent: 0, duration: 0.7, ease: 'expo.out', stagger: 0.07 })
-          .from(links, { y: 40, opacity: 0, duration: 0.8, stagger: 0.05 }, 0.25);
-      } else {
-        menuTl = gsap.timeline().to(parts.slice().reverse(), { xPercent: 100, duration: 0.5, ease: 'expo.in', stagger: 0.05 });
-      }
+      const l = window.__lenis;
+      if (l) open ? l.stop() : l.start();
+      if (open) $('nav a', menu).focus({ preventScroll: true });
+      else toggle.focus({ preventScroll: true });
     }
-    if (window.gsap) gsap.set($$('.menu-layer, .menu-panel', menu), { x: 0, xPercent: 100 });
     toggle.addEventListener('click', () => toggleMenu(!d.classList.contains('menu-open')));
+    $$('[data-close]', menu).forEach(el => el.addEventListener('click', () => toggleMenu(false)));
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && d.classList.contains('menu-open')) toggleMenu(false); });
 
-    /* vídeos: só tocam quando aparecem na tela */
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const vids = $$('video');
-    if ('IntersectionObserver' in window) {
+    /* vídeos fora das etapas: tocam só quando aparecem */
+    const vids = $$('video').filter(v => !v.closest('.como-media'));
+    if ('IntersectionObserver' in window && !reduce) {
       const io = new IntersectionObserver(entries => {
         entries.forEach(en => {
           const v = en.target;
-          if (en.isIntersecting) {
-            if (v.preload === 'none') v.preload = 'auto';
-            if (!reduce) { const p = v.play(); if (p) p.catch(() => {}); }
-          } else v.pause();
+          if (en.isIntersecting) { if (v.preload === 'none') v.preload = 'auto'; const p = v.play(); if (p) p.catch(() => {}); }
+          else v.pause();
         });
-      }, { rootMargin: '200px 0px' });
+      }, { rootMargin: '150px 0px' });
       vids.forEach(v => io.observe(v));
     }
-    if (reduce) vids.forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
 
-    /* comparador funciona mesmo sem GSAP */
-    if (!window.gsap || !d.classList.contains('motion')) setupCompare(false);
-
-    /* bolhas de sabão no clique (ClickSpark, React Bits) */
-    if (!reduce && window.gsap) {
-      document.addEventListener('pointerdown', e => {
-        if (e.target.closest('input, label, .compare-box, .menu')) return;
-        for (let i = 0; i < 5; i++) {
-          const b = document.createElement('span');
-          b.className = 'pop';
-          const s = gsap.utils.random(10, 24);
-          Object.assign(b.style, { width: s + 'px', height: s + 'px', left: e.clientX - s / 2 + 'px', top: e.clientY - s / 2 + 'px' });
-          document.body.appendChild(b);
-          const ang = gsap.utils.random(-Math.PI, 0);
-          const dist = gsap.utils.random(30, 70);
-          gsap.fromTo(b, { scale: 0.2, opacity: 1 }, {
-            x: Math.cos(ang) * dist, y: Math.sin(ang) * dist - 20, scale: 1, opacity: 0,
-            duration: gsap.utils.random(0.7, 1.1), ease: 'power2.out', onComplete: () => b.remove()
-          });
-        }
-      });
+    /* botão fixo sem GSAP: aparece depois do topo */
+    if (!window.ScrollTrigger) {
+      const zap = $('.zap-fixo');
+      const onScroll = () => zap.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.8);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
     }
 
-    /* formulário: monta a mensagem e abre o WhatsApp */
+    /* galeria: setas e arrastar com o mouse */
+    const gal = $('.gal');
+    $$('.gal-btn').forEach(b => b.addEventListener('click', () => {
+      const item = $('li', gal);
+      const step = item ? item.getBoundingClientRect().width + 16 : 300;
+      gal.scrollBy({ left: step * +b.dataset.dir, behavior: reduce ? 'auto' : 'smooth' });
+    }));
+    let down = false, sx = 0, sl = 0, moved = false;
+    gal.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse') return;
+      down = true; moved = false; sx = e.clientX; sl = gal.scrollLeft;
+      gal.classList.add('is-dragging');
+    });
+    window.addEventListener('pointermove', e => {
+      if (!down) return;
+      const dx = e.clientX - sx;
+      if (Math.abs(dx) > 4) moved = true;
+      gal.scrollLeft = sl - dx;
+    });
+    window.addEventListener('pointerup', () => {
+      if (!down) return;
+      down = false;
+      gal.classList.remove('is-dragging');
+    });
+    gal.addEventListener('click', e => { if (moved) { e.preventDefault(); moved = false; } }, true);
+
+    /* formulário: monta a mensagem, abre o WhatsApp e solta as bolhas */
     const form = $('#pedido');
     const erro = $('#pedido-erro');
+    const ok = $('#pedido-ok');
     form.addEventListener('change', () => { erro.hidden = true; });
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -591,6 +368,29 @@
       document.body.appendChild(link);
       link.click();
       link.remove();
+      ok.hidden = false;
+      if (!reduce && window.gsap) bolhas($('.ficha-enviar'));
     });
+  }
+
+  /* bolhas de sabão saindo do botão, como na marca */
+  function bolhas(el) {
+    const r = el.getBoundingClientRect();
+    for (let i = 0; i < 14; i++) {
+      const b = document.createElement('span');
+      b.className = 'pop';
+      const s = gsap.utils.random(10, 34);
+      Object.assign(b.style, {
+        width: s + 'px', height: s + 'px',
+        left: (r.left + gsap.utils.random(0, r.width)) - s / 2 + 'px',
+        top: (r.top + r.height / 2) - s / 2 + 'px'
+      });
+      document.body.appendChild(b);
+      gsap.fromTo(b, { scale: 0.3, opacity: 1 }, {
+        y: -gsap.utils.random(80, 220), x: gsap.utils.random(-40, 40), scale: 1,
+        duration: gsap.utils.random(1.1, 1.8), ease: 'power1.out', delay: i * 0.03
+      });
+      gsap.to(b, { opacity: 0, duration: 0.3, delay: gsap.utils.random(0.9, 1.6), onComplete: () => b.remove() });
+    }
   }
 })();
