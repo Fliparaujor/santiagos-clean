@@ -187,7 +187,7 @@
     const base = $('.mangueira-base');
     const agua = $('.mangueira-agua');
     const bico = $('.mangueira-bico');
-    let current = -1, segs = [], total = 0, progress = 0;
+    let current = -1, segs = [], total = 0, progress = 0, shown = 0, ang = 0;
 
     // desenha a mangueira em curvas, passando pelo número de cada etapa
     const buildPath = () => {
@@ -222,16 +222,29 @@
       agua.style.strokeDasharray = total;
       draw();
     };
-    const draw = () => {
+    // a ponta chega no número de uma etapa no meio do trecho dela na rolagem
+    const target = () => {
       const n = items.length;
-      const p = clamp(progress, 0, 1) * (n - 1);
-      const i = Math.min(n - 2, Math.floor(p));
-      const len = animate ? segs[i] + (segs[i + 1] - segs[i]) * (p - i) : total;
+      return animate ? clamp(progress * n - 0.5, 0, n - 1) : n - 1;
+    };
+    const draw = () => {
+      if (!segs.length) return;
+      const h = shown;
+      const i = Math.min(segs.length - 2, Math.floor(h));
+      const len = segs[i] + (segs[i + 1] - segs[i]) * (h - i);
       agua.style.strokeDashoffset = total - len;
       const pt = agua.getPointAtLength(Math.max(0.1, len));
-      const pt2 = agua.getPointAtLength(Math.max(0, len - 2));
-      const ang = Math.atan2(pt.y - pt2.y, pt.x - pt2.x) * 180 / Math.PI;
-      bico.style.transform = `translate(${pt.x}px, ${pt.y}px) translate(-50%, -50%) rotate(${ang - 90}deg)`;
+      const pt2 = agua.getPointAtLength(Math.max(0, len - 6));
+      const a = Math.atan2(pt.y - pt2.y, pt.x - pt2.x) * 180 / Math.PI - 90;
+      ang += (a - ang) * 0.2;
+      bico.style.transform = `translate(${pt.x}px, ${pt.y}px) translate(-50%, -50%) rotate(${ang}deg)`;
+    };
+    // a mangueira persegue a rolagem com suavidade, quadro a quadro
+    const follow = () => {
+      const t = target();
+      if (Math.abs(t - shown) < 0.001) return;
+      shown += (t - shown) * 0.14;
+      draw();
     };
 
     const show = i => {
@@ -243,13 +256,13 @@
         if (k === i) { if (v.preload === 'none') v.preload = 'auto'; const p = v.play(); if (p) p.catch(() => {}); }
         else v.pause();
       });
-      requestAnimationFrame(buildPath);
     };
     show(0);
     window.addEventListener('resize', () => requestAnimationFrame(buildPath));
     if (document.fonts) document.fonts.ready.then(buildPath);
 
     if (!animate) {
+      shown = items.length - 1;
       btns.forEach((b, i) => b.addEventListener('click', () => show(i)));
       return;
     }
@@ -258,13 +271,13 @@
       onUpdate(self) {
         progress = self.progress;
         show(Math.min(items.length - 1, Math.floor(self.progress * items.length)));
-        draw();
       },
       onLeave: () => vids.forEach(v => v.pause()),
       onLeaveBack: () => vids.forEach(v => v.pause()),
       onEnter: () => vids[current] && vids[current].play().catch(() => {}),
       onEnterBack: () => vids[current] && vids[current].play().catch(() => {})
     });
+    gsap.ticker.add(follow);
     btns.forEach((b, i) => b.addEventListener('click', () => {
       const y = st.start + (st.end - st.start) * ((i + 0.35) / items.length);
       if (lenis) lenis.scrollTo(y, { duration: 1.1 }); else window.scrollTo({ top: y, behavior: 'smooth' });
@@ -627,24 +640,31 @@
       if (window.gsap && !reduce) gsap.to({ v: x }, { v: to, duration: 0.35, ease: 'power2.out', onUpdate() { set(this.targets()[0].v); }, onComplete: done });
       else { set(to); done && done(); }
     };
+    let downX = 0;
     handle.addEventListener('pointerdown', e => {
-      measure(); down = true; moved = false; startX = e.clientX - x;
+      measure(); down = true; moved = false; downX = e.clientX; startX = e.clientX - x;
       handle.setPointerCapture(e.pointerId);
     });
     handle.addEventListener('pointermove', e => {
       if (!down) return;
-      const v = clamp(e.clientX - startX, 0, max);
-      if (Math.abs(v - x) > 2) moved = true;
-      set(v);
+      // só conta como arrastar depois de 8 px; menos que isso é um clique
+      if (!moved && Math.abs(e.clientX - downX) < 8) return;
+      moved = true;
+      set(clamp(e.clientX - startX, 0, max));
     });
     handle.addEventListener('pointerup', () => {
       if (!down) return;
       down = false;
-      if (!moved) return; // um clique simples segue como envio normal
-      if (x > max * 0.8) { set(max); form.requestSubmit(handle); }
+      if (!moved) return; // clique: o botão envia sozinho
+      if (x > max * 0.6) { set(max); form.requestSubmit(handle); }
       else animateTo(0);
     });
     handle.addEventListener('click', e => { if (moved) { e.preventDefault(); moved = false; } });
+    // tocar em qualquer ponto da barra também envia
+    track.addEventListener('click', e => {
+      if (e.target.closest('.desliza-bico')) return;
+      form.requestSubmit(handle);
+    });
     track._reset = ok => {
       if (ok) {
         track.classList.add('is-done');
