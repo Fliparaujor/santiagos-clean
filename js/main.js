@@ -12,6 +12,51 @@
   const ano = $('#ano');
   if (ano) ano.textContent = new Date().getFullYear();
 
+  /* sem viúvas: a última palavra de cada bloco de texto desce junto com a
+     penúltima (espaço que não quebra entre as duas) */
+  function semViuvas() {
+    $$('p, li, h1 .line, h2, h3, figcaption, dd, legend, .svc-desc, .stack-text p').forEach(el => {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const t = nodes[i].nodeValue;
+        const trimmed = t.replace(/\s+$/, '');
+        const k = trimmed.lastIndexOf(' ');
+        if (k > 0) { nodes[i].nodeValue = trimmed.slice(0, k) + ' ' + trimmed.slice(k + 1) + t.slice(trimmed.length); break; }
+        if (trimmed.length && k === -1 && i > 0) {
+          // a última palavra está sozinha num nó (dentro de <em>): segura o espaço anterior
+          const prev = nodes[i - 1];
+          if (/ $/.test(prev.nodeValue)) { prev.nodeValue = prev.nodeValue.replace(/ $/, ' '); break; }
+        }
+        if (trimmed.length) break;
+      }
+    });
+  }
+  semViuvas();
+
+  /* nos títulos que viram linhas animadas, o espaço que não quebra se perde:
+     as duas últimas palavras vão juntas num bloco que não quebra */
+  $$('[data-split]').forEach(el => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const pos = [];
+    while (walker.nextNode()) {
+      const n = walker.currentNode;
+      const re = /[^\s ]+/g;
+      let m;
+      while ((m = re.exec(n.nodeValue))) pos.push([n, m.index, m.index + m[0].length]);
+    }
+    if (pos.length < 2) return;
+    const a = pos[pos.length - 2], z = pos[pos.length - 1];
+    const range = document.createRange();
+    range.setStart(a[0], a[1]);
+    range.setEnd(z[0], z[2]);
+    const span = document.createElement('span');
+    span.className = 'nw';
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+  });
+
   const hasGSAP = !!(window.gsap && window.ScrollTrigger && window.SplitText);
   const motion = hasGSAP && d.classList.contains('motion');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;

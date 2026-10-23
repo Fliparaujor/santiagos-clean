@@ -83,7 +83,8 @@ img, video { display: block; max-width: 100%; }
 a { color: inherit; }
 em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
 h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 700; }
-p { margin: 0; }
+p { margin: 0; text-wrap: pretty; }
+.nw { display: inline-block; white-space: nowrap; }
 ::selection { background: var(--sun); color: var(--ink); }
 :focus-visible { outline: 2px solid var(--tide); outline-offset: 3px; border-radius: 4px; }
 
@@ -315,13 +316,14 @@ html.motion:not(.intro-seen) .intro {
    ========================================================================== */
 .hero { position: relative; padding-top: calc(var(--header) + clamp(40px, 7vw, 88px)); padding-bottom: clamp(48px, 7vw, 96px); }
 .hero-grid { display: grid; gap: clamp(40px, 6vw, 72px); align-items: center; }
-@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.25fr 1fr; } }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.45fr 1fr; } }
 .hero-copy { display: grid; gap: 26px; min-width: 0; }
 .hero-title {
   font-family: var(--display); font-variation-settings: "opsz" 96;
-  font-weight: 800; font-size: clamp(58px, 10.4vw, 156px);
-  line-height: .86; letter-spacing: -.05em;
+  font-weight: 800; font-size: clamp(44px, 6.6vw, 88px);
+  line-height: .88; letter-spacing: -.05em;
 }
+.hero-title .line { white-space: nowrap; }
 .hero-title .line { display: block; }
 .hero-title em { font-size: 1.08em; color: var(--tide); letter-spacing: -.03em; }
 .hero-lead { font-size: clamp(17px, 1.6vw, 20px); color: var(--ink-2); max-width: 44ch; }
