@@ -141,7 +141,9 @@ p { margin: 0; text-wrap: pretty; }
   transition: border-color .3s;
 }
 .header.is-scrolled { border-bottom-color: var(--line); }
-.header-inner { height: var(--header); display: flex; align-items: center; gap: var(--s4); }
+.header-inner { height: var(--header); display: flex; align-items: center; gap: var(--s3); }
+@media (min-width: 640px) { .header-inner { gap: var(--s4); } }
+@media (max-width: 359px) { .brand-name { font-size: 16px; } .menu-toggle { padding: 0 12px; } }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
 .brand-mark { width: 28px; height: 28px; color: var(--tide); flex: none; }
 .brand-name { font-weight: 800; font-stretch: var(--wide); font-size: 18px; letter-spacing: -.01em; white-space: nowrap; }
