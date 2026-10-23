@@ -13,7 +13,7 @@
   <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml" href="assets/marca.svg">
   <link rel="preload" href="assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" as="image" href="assets/media/ad-poltrona-antes.webp">
+  <link rel="preload" as="image" href="assets/media/hero-extracao.webp">
   <script>
     (function () {
       var d = document.documentElement;
@@ -35,11 +35,11 @@
     "sameAs": ["https://www.instagram.com/santiagosclean2026/"]
   }
   </script>
-  <link rel="stylesheet" href="css/main.css?v=3">
+  <link rel="stylesheet" href="css/main.css?v=4">
   <script defer src="assets/vendor/gsap.min.js"></script>
   <script defer src="assets/vendor/ScrollTrigger.min.js"></script>
   <script defer src="assets/vendor/lenis.min.js"></script>
-  <script defer src="js/main.js?v=3"></script>
+  <script defer src="js/main.js?v=4"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -49,14 +49,15 @@
     <circle cx="24" cy="33" r="3.4" fill="var(--mark-cut, #f3f6f7)"/>
   </symbol>
   <symbol id="zap" viewBox="0 0 24 24">
-    <path fill="currentColor" d="M12 2.2a9.7 9.7 0 0 0-8.3 14.8L2.4 21.8l4.9-1.3A9.7 9.7 0 1 0 12 2.2Zm0 17.7c-1.5 0-2.9-.4-4.2-1.1l-.3-.2-2.9.8.8-2.8-.2-.3a8 8 0 1 1 6.8 3.6Zm4.4-6c-.2-.1-1.4-.7-1.700-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.7.5-.1 1.4-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.4-.2Z"/>
+    <path fill="currentColor" d="M12 2.2a9.7 9.7 0 0 0-8.3 14.8L2.4 21.8l4.9-1.3A9.7 9.7 0 1 0 12 2.2Zm0 17.7c-1.5 0-2.9-.4-4.2-1.1l-.3-.2-2.9.8.8-2.8-.2-.3a8 8 0 1 1 6.8 3.6Zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3c-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.7.5-.1 1.4-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.4-.2Z"/>
   </symbol>
   <symbol id="seta" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <!-- bico do extrator, visto de frente: é o divisor do antes e depois -->
-  <symbol id="bico" viewBox="0 0 40 120">
-    <path d="M15 4h10v56H15z" fill="#0e2236"/>
-    <path d="M5 58h30l-5 56H10z" fill="#f3f6f7" stroke="#0e2236" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M12 102h16" stroke="#0e2236" stroke-width="2" stroke-linecap="round" opacity=".45"/>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <!-- bico do extrator, visto de cima: o cabo e a boca larga que passa no tecido -->
+  <symbol id="bico" viewBox="0 0 40 40">
+    <path d="M17 2h6v18h-6z" fill="currentColor"/>
+    <path d="M6 20h28l-3 16H9z" fill="#f3f6f7" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M12 31h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".45"/>
   </symbol>
 </svg>
 
@@ -101,76 +102,78 @@
 
 <main id="principal" tabindex="-1">
 
-  <!-- ============ HERO: o antes e depois é a abertura ============ -->
+  <!-- ============ HERO: três vídeos do serviço em tela cheia; a rolagem passa o bico ============ -->
   <section class="hero" id="inicio">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <h1 class="hero-title" data-wipe>Lavagem de estofados em Lavras e região</h1>
+    <div class="hero-pin">
+      <div class="hero-tri">
+        <figure class="tri tri-a">
+          <video src="assets/media/hero-aplicacao.mp4" poster="assets/media/hero-aplicacao.webp" muted loop playsinline autoplay preload="auto" aria-label="Produto sendo borrifado num sofá bege"></video>
+          <figcaption>Aplicação do produto</figcaption>
+        </figure>
+        <figure class="tri tri-b">
+          <video class="hero-scrub" src="assets/media/hero-extracao.mp4" poster="assets/media/hero-extracao.webp" muted loop playsinline autoplay preload="auto" aria-label="Bico extrator passando num sofá e deixando uma faixa limpa"></video>
+          <figcaption>Extração da sujeira</figcaption>
+        </figure>
+        <figure class="tri tri-c">
+          <video src="assets/media/hero-esfregacao.mp4" poster="assets/media/hero-esfregacao.webp" muted loop playsinline autoplay preload="auto" aria-label="Máquina de escova esfregando um colchão"></video>
+          <figcaption>Esfregação com máquina</figcaption>
+        </figure>
+      </div>
+      <div class="hero-copy wrap">
+        <h1 class="hero-title">Lavagem de estofados em Lavras e região</h1>
         <p class="hero-lead">Sofá, colchão, tapete, carpete e cadeira lavados no local, com máquina extratora. Mande uma foto pelo WhatsApp pra pedir o orçamento.</p>
         <div class="hero-actions">
-          <a class="btn btn-ink btn-big" href="https://wa.me/5535999103461?text=Ol%C3%A1%2C%20Santiago!%20Vim%20pelo%20site%20e%20quero%20um%20or%C3%A7amento." target="_blank" rel="noopener">
+          <a class="btn btn-sun btn-big" href="https://wa.me/5535999103461?text=Ol%C3%A1%2C%20Santiago!%20Vim%20pelo%20site%20e%20quero%20um%20or%C3%A7amento." target="_blank" rel="noopener">
             <svg aria-hidden="true"><use href="#zap"/></svg><span>Chamar no WhatsApp</span>
           </a>
           <p class="hero-phone">ou ligue <a class="nowrap" href="tel:+5535999103461">(35) 9 9910-3461</a></p>
         </div>
-        <p class="hero-who">Santiago Costa e equipe · <a href="https://www.instagram.com/santiagosclean2026/" target="_blank" rel="noopener">@santiagosclean2026</a></p>
       </div>
-
-      <figure class="compare compare-hero" style="--pos: 50%">
-        <div class="compare-box">
-          <img src="assets/media/ad-poltrona-depois.webp" alt="Poltrona clara depois da lavagem" width="720" height="900" fetchpriority="high">
-          <div class="compare-before"><img src="assets/media/ad-poltrona-antes.webp" alt="A mesma poltrona antes da lavagem, com o assento encardido" width="720" height="900"></div>
-          <span class="compare-line" aria-hidden="true"><svg class="compare-bico"><use href="#bico"/></svg></span>
-          <span class="tag tag-before">Antes</span>
-          <span class="tag tag-after">Depois</span>
-          <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Comparar a poltrona antes e depois" id="cmp-hero">
-        </div>
-        <figcaption>Poltrona lavada num atendimento. Arraste o bico pra comparar.</figcaption>
-      </figure>
+      <p class="hero-hint" aria-hidden="true">Role a página e o bico passa no sofá</p>
     </div>
   </section>
 
-  <!-- ============ COMO É FEITO: etapas presas na tela ============ -->
+  <!-- ============ COMO É FEITO: a mangueira liga as etapas ============ -->
   <section class="como" id="como">
     <div class="como-track">
       <div class="como-sticky wrap">
         <div class="como-side">
           <h2 class="sec-title" data-wipe>Como é feita a lavagem</h2>
           <p class="sec-lead">A mesma sequência aparece nos vídeos do Instagram. Quando a sujeira é pesada, a extração se repete.</p>
-          <ol class="etapas">
-            <li class="etapa is-active">
-              <button type="button" class="etapa-btn" data-step="0">
-                <span class="etapa-num">1</span>
-                <span class="etapa-nome">Aplicação do produto</span>
-              </button>
-              <p class="etapa-texto">O produto é borrifado em todo o tecido pra soltar a sujeira presa nas fibras.</p>
-              <span class="etapa-barra" aria-hidden="true"><span></span></span>
-            </li>
-            <li class="etapa">
-              <button type="button" class="etapa-btn" data-step="1">
-                <span class="etapa-num">2</span>
-                <span class="etapa-nome">Esfregação</span>
-              </button>
-              <p class="etapa-texto">A máquina de escova trabalha o tecido em círculos. Cantos e costuras são esfregados à mão.</p>
-              <span class="etapa-barra" aria-hidden="true"><span></span></span>
-            </li>
-            <li class="etapa">
-              <button type="button" class="etapa-btn" data-step="2">
-                <span class="etapa-num">3</span>
-                <span class="etapa-nome">Extração da sujeira</span>
-              </button>
-              <p class="etapa-texto">O bico do extrator passa faixa por faixa e puxa a água junto com a sujeira.</p>
-              <span class="etapa-barra" aria-hidden="true"><span></span></span>
-            </li>
-            <li class="etapa">
-              <button type="button" class="etapa-btn" data-step="3">
-                <span class="etapa-num">4</span>
-                <span class="etapa-nome">Secagem</span>
-              </button>
-              <p class="etapa-texto">No fim, o soprador tira o excesso de umidade do tecido.</p>
-              <span class="etapa-barra" aria-hidden="true"><span></span></span>
-            </li>
-          </ol>
+          <div class="etapas-wrap">
+            <svg class="mangueira" aria-hidden="true"><path class="mangueira-base"/><path class="mangueira-agua"/></svg>
+            <svg class="mangueira-bico" aria-hidden="true"><use href="#bico"/></svg>
+            <ol class="etapas">
+              <li class="etapa is-active">
+                <button type="button" class="etapa-btn" data-step="0">
+                  <span class="etapa-num">1</span>
+                  <span class="etapa-nome">Aplicação do produto</span>
+                </button>
+                <p class="etapa-texto">O produto é borrifado em todo o tecido pra soltar a sujeira presa nas fibras.</p>
+              </li>
+              <li class="etapa">
+                <button type="button" class="etapa-btn" data-step="1">
+                  <span class="etapa-num">2</span>
+                  <span class="etapa-nome">Esfregação</span>
+                </button>
+                <p class="etapa-texto">A máquina de escova trabalha o tecido em círculos. Cantos e costuras são esfregados à mão.</p>
+              </li>
+              <li class="etapa">
+                <button type="button" class="etapa-btn" data-step="2">
+                  <span class="etapa-num">3</span>
+                  <span class="etapa-nome">Extração da sujeira</span>
+                </button>
+                <p class="etapa-texto">O bico do extrator passa faixa por faixa e puxa a água junto com a sujeira.</p>
+              </li>
+              <li class="etapa">
+                <button type="button" class="etapa-btn" data-step="3">
+                  <span class="etapa-num">4</span>
+                  <span class="etapa-nome">Secagem</span>
+                </button>
+                <p class="etapa-texto">No fim, o soprador tira o excesso de umidade do tecido.</p>
+              </li>
+            </ol>
+          </div>
         </div>
         <div class="como-media">
           <video class="is-active" src="assets/media/p1-aplicacao.mp4" poster="assets/media/p1-aplicacao.webp" muted loop playsinline preload="none" aria-label="Pulverizador aplicando produto num sofá bege"></video>
@@ -182,102 +185,116 @@
     </div>
   </section>
 
-  <!-- ============ A ÁGUA ============ -->
+  <!-- ============ A ÁGUA: o vídeo ondula sob o dedo ============ -->
   <section class="agua" id="agua" aria-label="A água da extração">
     <div class="wrap agua-grid">
-      <video class="agua-video" src="assets/media/agua.mp4" poster="assets/media/agua.webp" muted loop playsinline preload="none" aria-label="Água marrom com espuma escorrendo no tanque do extrator"></video>
+      <div class="agua-media">
+        <video class="agua-video" src="assets/media/agua.mp4" poster="assets/media/agua.webp" muted loop playsinline preload="none" crossorigin="anonymous" aria-label="Água marrom com espuma escorrendo no tanque do extrator"></video>
+        <canvas class="agua-canvas" aria-hidden="true"></canvas>
+        <p class="agua-dica" aria-hidden="true">Passe o dedo na água</p>
+      </div>
       <div class="agua-copy">
-        <p class="agua-big" data-wipe>Essa água saiu de um sofá retrátil de dois lugares.</p>
+        <p class="agua-big">Essa água saiu de um sofá retrátil de dois lugares.</p>
         <p class="agua-small">É o que o extrator puxa do tecido na etapa 3. Antes da lavagem, ela estava no assento.</p>
       </div>
     </div>
   </section>
 
-  <!-- ============ ANTES E DEPOIS ============ -->
+  <!-- ============ ANTES E DEPOIS: a bolha mostra o limpo por baixo ============ -->
   <section class="ad" id="antes-depois">
     <div class="wrap">
       <div class="ad-head">
         <h2 class="sec-title" data-wipe>Antes e depois</h2>
-        <p class="sec-lead">Fotos tiradas nos atendimentos, do mesmo ângulo, antes e depois da lavagem.</p>
+        <p class="sec-lead">Fotos tiradas nos atendimentos, do mesmo ângulo. Arraste a bolha pela foto suja pra ver como ficou.</p>
       </div>
       <div class="ad-grid">
-        <figure class="compare" style="--pos: 50%">
-          <div class="compare-box">
-            <img src="assets/media/ad-colchao-depois.webp" alt="Colchão de casal branco depois da higienização" loading="lazy" width="720" height="900">
-            <div class="compare-before"><img src="assets/media/ad-colchao-antes.webp" alt="O mesmo colchão antes, com manchas amareladas" loading="lazy" width="720" height="900"></div>
-            <span class="compare-line" aria-hidden="true"><svg class="compare-bico"><use href="#bico"/></svg></span>
+        <figure class="bolha" style="--x: 50%; --y: 50%">
+          <div class="bolha-box" tabindex="0" role="img" aria-label="Poltrona antes da lavagem, com a bolha mostrando o depois. Use as setas para mover a bolha e Enter para ver o depois inteiro.">
+            <img src="assets/media/ad-poltrona-antes.webp" alt="" width="720" height="900" loading="lazy">
+            <div class="bolha-depois"><img src="assets/media/ad-poltrona-depois.webp" alt="" width="720" height="900" loading="lazy"></div>
+            <span class="bolha-anel" aria-hidden="true"><span>Depois</span></span>
             <span class="tag tag-before">Antes</span>
-            <span class="tag tag-after">Depois</span>
-            <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Comparar o colchão antes e depois" id="cmp-colchao">
           </div>
-          <figcaption>Colchão de casal, lavado na varanda</figcaption>
+          <figcaption><span>Poltrona</span><button type="button" class="bolha-ver">Ver depois inteiro</button></figcaption>
         </figure>
-        <figure class="compare" style="--pos: 50%">
-          <div class="compare-box">
-            <img src="assets/media/ad-sofa-depois.webp" alt="Sofá retrátil cinza depois da lavagem" loading="lazy" width="720" height="900">
-            <div class="compare-before"><img src="assets/media/ad-sofa-antes.webp" alt="O mesmo sofá retrátil antes, com marcas no assento" loading="lazy" width="720" height="900"></div>
-            <span class="compare-line" aria-hidden="true"><svg class="compare-bico"><use href="#bico"/></svg></span>
+        <figure class="bolha" style="--x: 50%; --y: 50%">
+          <div class="bolha-box" tabindex="0" role="img" aria-label="Colchão de casal antes da higienização, com a bolha mostrando o depois. Use as setas para mover a bolha e Enter para ver o depois inteiro.">
+            <img src="assets/media/ad-colchao-antes.webp" alt="" width="720" height="900" loading="lazy">
+            <div class="bolha-depois"><img src="assets/media/ad-colchao-depois.webp" alt="" width="720" height="900" loading="lazy"></div>
+            <span class="bolha-anel" aria-hidden="true"><span>Depois</span></span>
             <span class="tag tag-before">Antes</span>
-            <span class="tag tag-after">Depois</span>
-            <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Comparar o sofá retrátil antes e depois" id="cmp-sofa">
           </div>
-          <figcaption>Sofá retrátil de dois lugares</figcaption>
+          <figcaption><span>Colchão de casal, lavado na varanda</span><button type="button" class="bolha-ver">Ver depois inteiro</button></figcaption>
+        </figure>
+        <figure class="bolha" style="--x: 50%; --y: 50%">
+          <div class="bolha-box" tabindex="0" role="img" aria-label="Sofá retrátil antes da lavagem, com a bolha mostrando o depois. Use as setas para mover a bolha e Enter para ver o depois inteiro.">
+            <img src="assets/media/ad-sofa-antes.webp" alt="" width="720" height="900" loading="lazy">
+            <div class="bolha-depois"><img src="assets/media/ad-sofa-depois.webp" alt="" width="720" height="900" loading="lazy"></div>
+            <span class="bolha-anel" aria-hidden="true"><span>Depois</span></span>
+            <span class="tag tag-before">Antes</span>
+          </div>
+          <figcaption><span>Sofá retrátil de dois lugares</span><button type="button" class="bolha-ver">Ver depois inteiro</button></figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- ============ SERVIÇOS ============ -->
+  <!-- ============ SERVIÇOS: sanfona de fotos ============ -->
   <section class="servicos" id="servicos">
     <div class="wrap">
       <h2 class="sec-title" data-wipe>O que a Santiago's Clean lava</h2>
-      <ul class="svc-list">
-        <li><a class="svc" href="#orcamento" data-item="Sofá">
-          <span class="svc-name">Sofás</span>
-          <span class="svc-desc">Fixos e retráteis, de dois e três lugares, de tecido ou veludo.</span>
-          <span class="svc-img"><img src="assets/media/sv-sofa.webp" alt="" loading="lazy" width="720" height="900"></span>
+      <ul class="acc">
+        <li class="acc-item is-open"><a href="#orcamento" data-item="Sofá">
+          <img src="assets/media/sv-sofa.webp" alt="" loading="lazy" width="720" height="900">
+          <span class="acc-txt"><span class="acc-nome">Sofás</span><span class="acc-desc">Fixos e retráteis, de dois e três lugares, de tecido ou veludo.</span></span>
         </a></li>
-        <li><a class="svc" href="#orcamento" data-item="Colchão">
-          <span class="svc-name">Colchões</span>
-          <span class="svc-desc">Colchões de casal, lavados com a mesma extratora dos sofás.</span>
-          <span class="svc-img"><img src="assets/media/sv-colchao.webp" alt="" loading="lazy" width="720" height="900"></span>
+        <li class="acc-item"><a href="#orcamento" data-item="Colchão">
+          <img src="assets/media/sv-colchao.webp" alt="" loading="lazy" width="720" height="900">
+          <span class="acc-txt"><span class="acc-nome">Colchões</span><span class="acc-desc">Colchões de casal, lavados com a mesma extratora dos sofás.</span></span>
         </a></li>
-        <li><a class="svc" href="#orcamento" data-item="Tapete">
-          <span class="svc-name">Tapetes</span>
-          <span class="svc-desc">Felpudos de fibra alta e tapetes redondos.</span>
-          <span class="svc-img"><img src="assets/media/sv-tapete.webp" alt="" loading="lazy" width="720" height="900"></span>
+        <li class="acc-item"><a href="#orcamento" data-item="Tapete">
+          <img src="assets/media/sv-tapete.webp" alt="" loading="lazy" width="720" height="900">
+          <span class="acc-txt"><span class="acc-nome">Tapetes</span><span class="acc-desc">Felpudos de fibra alta e tapetes redondos.</span></span>
         </a></li>
-        <li><a class="svc" href="#orcamento" data-item="Carpete">
-          <span class="svc-name">Carpetes</span>
-          <span class="svc-desc">Carpete de escritório, como o da Expresso Nepomuceno.</span>
-          <span class="svc-img"><img src="assets/media/sv-carpete.webp" alt="" loading="lazy" width="720" height="900"></span>
+        <li class="acc-item"><a href="#orcamento" data-item="Carpete">
+          <img src="assets/media/sv-carpete.webp" alt="" loading="lazy" width="720" height="900">
+          <span class="acc-txt"><span class="acc-nome">Carpetes</span><span class="acc-desc">Carpete de escritório, como o da Expresso Nepomuceno.</span></span>
         </a></li>
-        <li><a class="svc" href="#orcamento" data-item="Cadeiras">
-          <span class="svc-name">Cadeiras</span>
-          <span class="svc-desc">Cadeiras de jantar com assento e encosto estofados.</span>
-          <span class="svc-img"><img src="assets/media/sv-cadeiras.webp" alt="" loading="lazy" width="720" height="900"></span>
+        <li class="acc-item"><a href="#orcamento" data-item="Cadeiras">
+          <img src="assets/media/sv-cadeiras.webp" alt="" loading="lazy" width="720" height="900">
+          <span class="acc-txt"><span class="acc-nome">Cadeiras</span><span class="acc-desc">Cadeiras de jantar com assento e encosto estofados.</span></span>
         </a></li>
-        <li><a class="svc" href="#orcamento" data-item="Poltrona">
-          <span class="svc-name">Poltronas</span>
-          <span class="svc-desc">Avulsas ou junto com o sofá da sala.</span>
-          <span class="svc-img"><img src="assets/media/sv-poltronas.webp" alt="" loading="lazy" width="720" height="900"></span>
+        <li class="acc-item"><a href="#orcamento" data-item="Poltrona">
+          <img src="assets/media/sv-poltronas.webp" alt="" loading="lazy" width="720" height="900">
+          <span class="acc-txt"><span class="acc-nome">Poltronas</span><span class="acc-desc">Avulsas ou junto com o sofá da sala.</span></span>
         </a></li>
       </ul>
     </div>
   </section>
 
-  <!-- ============ EMPRESAS ============ -->
+  <!-- ============ EMPRESAS: ordem de serviço ============ -->
   <section class="empresas" id="empresas">
     <div class="wrap empresas-grid">
+      <div class="empresas-copy">
+        <h2 class="sec-title" data-wipe>Atendimento em empresas</h2>
+        <p>A Expresso Nepomuceno chamou a Santiago's Clean pra lavar o carpete do escritório. Foi a mesma sequência de uma casa, mesa por mesa.</p>
+        <div class="os">
+          <p class="os-topo"><span>Ordem de serviço</span><span class="os-status">Concluído</span></p>
+          <p class="os-cliente">Expresso Nepomuceno · carpete do escritório</p>
+          <ol class="os-etapas">
+            <li><span class="os-check"><svg aria-hidden="true"><use href="#check"/></svg></span>Aspiração</li>
+            <li><span class="os-check"><svg aria-hidden="true"><use href="#check"/></svg></span>Aplicação do produto</li>
+            <li><span class="os-check"><svg aria-hidden="true"><use href="#check"/></svg></span>Esfregação com máquina</li>
+            <li><span class="os-check"><svg aria-hidden="true"><use href="#check"/></svg></span>Extração da sujeira</li>
+          </ol>
+          <span class="os-linha" aria-hidden="true"><span></span></span>
+        </div>
+        <p class="empresas-nota">Escritório, recepção ou sala de reunião. Mande fotos do espaço e combine o dia.</p>
+        <a class="btn btn-outline" href="#orcamento" data-item="Carpete"><span>Pedir orçamento para empresa</span></a>
+      </div>
       <div class="empresas-media">
         <figure class="em-a" data-reveal><img src="assets/media/empresa-equipe.webp" alt="Equipe esfregando o carpete cinza de um escritório com máquinas" loading="lazy" width="720" height="900"></figure>
         <figure class="em-b" data-reveal><img src="assets/media/empresa-placa.webp" alt="Extrator passando no carpete do escritório ao lado da máquina verde" loading="lazy" width="720" height="900"></figure>
-      </div>
-      <div class="empresas-copy">
-        <h2 class="sec-title" data-wipe>Atendimento em empresas</h2>
-        <p>A Expresso Nepomuceno chamou a Santiago's Clean pra lavar o carpete do escritório. Foi a mesma sequência de uma casa: aspiração, produto, máquina e extração, mesa por mesa.</p>
-        <p>Escritório, recepção ou sala de reunião. Mande fotos do espaço e combine o dia.</p>
-        <a class="btn btn-sun" href="#orcamento" data-item="Carpete"><span>Pedir orçamento para empresa</span></a>
       </div>
     </div>
   </section>
@@ -291,9 +308,11 @@
         <p>Os atendimentos viram vídeo no Instagram, do produto à água suja. Dá pra ver o trabalho antes de chamar.</p>
         <a class="link-arrow" href="https://www.instagram.com/santiagosclean2026/" target="_blank" rel="noopener">Ver os vídeos no Instagram <svg aria-hidden="true"><use href="#seta"/></svg></a>
       </div>
-      <figure class="quem-photo" data-reveal>
-        <img src="assets/media/santiago.webp" alt="Santiago Costa com a camiseta da Santiago's Clean" loading="lazy" width="720" height="900">
-        <figcaption>Santiago Costa</figcaption>
+      <figure class="quem-card">
+        <div class="quem-tilt">
+          <img src="assets/media/santiago.webp" alt="Santiago Costa com a camiseta da Santiago's Clean" loading="lazy" width="720" height="900">
+          <figcaption class="quem-legenda"><strong>Santiago Costa</strong><span>Lavras – MG</span></figcaption>
+        </div>
       </figure>
       <figure class="quem-side" data-reveal>
         <img src="assets/media/santiago-tapete.webp" alt="Santiago esfregando um tapete redondo branco com escova" loading="lazy" width="720" height="900">
@@ -302,16 +321,14 @@
     </div>
   </section>
 
-  <!-- ============ GALERIA: faixa pra arrastar ============ -->
+  <!-- ============ GALERIA: parede infinita pra arrastar ============ -->
   <section class="galeria" id="galeria" aria-labelledby="gal-titulo">
     <div class="wrap gal-head">
       <h2 class="sec-title" id="gal-titulo" data-wipe>Resultado final</h2>
-      <div class="gal-nav">
-        <button type="button" class="gal-btn" data-dir="-1" aria-label="Fotos anteriores"><svg aria-hidden="true" style="transform:rotate(180deg)"><use href="#seta"/></svg></button>
-        <button type="button" class="gal-btn" data-dir="1" aria-label="Próximas fotos"><svg aria-hidden="true"><use href="#seta"/></svg></button>
-      </div>
+      <p class="sec-lead">Arraste a parede de fotos pra qualquer lado.</p>
     </div>
-    <ul class="gal" tabindex="0" aria-label="Fotos de estofados depois da lavagem">
+    <div class="inf" aria-hidden="true"><div class="inf-stage"></div></div>
+    <ul class="gal-lista">
       <li><figure><img src="assets/media/g-floral.webp" alt="Sofá floral claro depois da lavagem" loading="lazy" width="720" height="900"><figcaption>Sofá floral de dois lugares</figcaption></figure></li>
       <li><figure><img src="assets/media/g-tapete.webp" alt="Tapete redondo felpudo branco depois da lavagem" loading="lazy" width="720" height="900"><figcaption>Tapete redondo felpudo</figcaption></figure></li>
       <li><figure><img src="assets/media/sv-sofa.webp" alt="Sofá creme com encosto em gomos depois da lavagem" loading="lazy" width="720" height="900"><figcaption>Sofá com encosto em gomos</figcaption></figure></li>
@@ -323,7 +340,7 @@
     </ul>
   </section>
 
-  <!-- ============ ORÇAMENTO: ficha ============ -->
+  <!-- ============ ORÇAMENTO: ficha; o envio é arrastar o bico ============ -->
   <section class="orcamento" id="orcamento">
     <div class="wrap orc-grid">
       <div class="orc-copy">
@@ -360,9 +377,13 @@
           </div>
         </div>
         <p class="ficha-erro" id="pedido-erro" role="alert" hidden>Marque pelo menos um item pra lavar.</p>
-        <button class="btn btn-sun btn-big ficha-enviar" type="submit">
-          <svg aria-hidden="true"><use href="#zap"/></svg><span>Abrir o WhatsApp com a mensagem</span>
-        </button>
+        <div class="desliza">
+          <span class="desliza-agua" aria-hidden="true"></span>
+          <span class="desliza-texto" aria-hidden="true">Arraste o bico pra abrir o WhatsApp</span>
+          <button class="desliza-bico" type="submit" aria-label="Abrir o WhatsApp com a mensagem">
+            <svg aria-hidden="true"><use href="#bico"/></svg>
+          </button>
+        </div>
         <p class="ficha-ok" id="pedido-ok" role="status" hidden>O WhatsApp foi aberto numa nova aba com a sua mensagem. Se não abriu, chame no <span class="nowrap">(35) 9 9910-3461</span>.</p>
       </form>
     </div>
@@ -373,7 +394,7 @@
   <div class="wrap footer-grid">
     <div class="footer-contato">
       <p class="footer-label">WhatsApp e telefone</p>
-      <a class="footer-phone nowrap" href="https://wa.me/5535999103461" target="_blank" rel="noopener">(35) 9 9910-3461</a>
+      <a class="footer-phone nowrap" href="https://wa.me/5535999103461" target="_blank" rel="noopener" aria-label="(35) 9 9910-3461, abrir no WhatsApp">(35) 9 9910-3461</a>
       <p>Atendimento em Lavras – MG e região</p>
     </div>
     <div class="footer-info">

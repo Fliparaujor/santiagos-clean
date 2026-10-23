@@ -1,8 +1,8 @@
 /* ==========================================================================
    Santiago's Clean
-   Ideia visual: a passada do bico extrator. O antes e depois abre a página,
-   o bico é o divisor, e títulos, botões e fotos entram da esquerda para a
-   direita, como uma faixa limpa no tecido.
+   Ideia visual: a passada do bico extrator. O topo mostra o serviço em três
+   vídeos e a rolagem passa o bico; a mangueira liga as etapas; a bolha de
+   sabão mostra o limpo por baixo; o envio do orçamento é arrastar o bico.
    Uma família só (Archivo): larga nos títulos, como etiqueta de máquina;
    normal no texto corrido. Visual claro, único; não segue o tema escuro.
    ========================================================================== */
@@ -61,14 +61,13 @@ body::before {
   content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
   z-index: 60; background: var(--paper);
 }
-img, video { display: block; max-width: 100%; }
+img, video, canvas { display: block; max-width: 100%; }
 a { color: inherit; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 p { margin: 0; text-wrap: pretty; }
 ::selection { background: var(--sun); color: var(--ink); }
 :focus-visible { outline: 2px solid var(--tide); outline-offset: 3px; }
 .nowrap { white-space: nowrap; }
-.nw { white-space: nowrap; }
 
 .wrap {
   width: 100%; max-width: 1200px; margin-inline: auto;
@@ -97,13 +96,13 @@ p { margin: 0; text-wrap: pretty; }
 
 /* ---------- botões: o fundo entra como uma passada ---------- */
 .btn {
-  --bg: var(--ink); --fg: var(--paper); --wipe: var(--tide);
+  --bg: var(--ink); --fg: var(--paper); --wipe: var(--tide); --fg-hover: var(--fg);
   position: relative; display: inline-flex; align-items: center; gap: 10px;
   min-height: 48px; padding: 0 20px; border-radius: var(--r); border: 0;
   background: var(--bg); color: var(--fg);
   font: 650 15px/1 var(--font); font-stretch: 108%;
   text-decoration: none; cursor: pointer; white-space: nowrap;
-  overflow: hidden; isolation: isolate;
+  overflow: hidden; isolation: isolate; transition: color .3s;
 }
 .btn svg { width: 20px; height: 20px; flex: none; }
 .btn::before {
@@ -111,9 +110,12 @@ p { margin: 0; text-wrap: pretty; }
   transform: scaleX(0); transform-origin: 0 50%; transition: transform .45s var(--ease);
 }
 .btn:hover::before, .btn:focus-visible::before { transform: scaleX(1); }
+.btn:hover, .btn:focus-visible { color: var(--fg-hover); }
 .btn-ink { --bg: var(--ink); --fg: var(--paper); --wipe: var(--tide); }
 .btn-sun { --bg: var(--sun); --fg: var(--ink); --wipe: #ffd970; }
 .btn-big { min-height: 56px; padding: 0 26px; font-size: 16px; }
+/* contorno que se enche com a passada (MicroKit, Outline Wipe Button) */
+.btn-outline { --bg: transparent; --fg: currentColor; --wipe: var(--sun); --fg-hover: var(--ink); box-shadow: inset 0 0 0 1.5px currentColor; }
 
 .link-arrow {
   display: inline-flex; align-items: center; gap: 8px; font-weight: 650; text-decoration: none;
@@ -136,9 +138,7 @@ p { margin: 0; text-wrap: pretty; }
    ========================================================================== */
 .header {
   position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 50;
-  background: var(--paper);
-  border-bottom: 1px solid transparent;
-  transition: border-color .3s;
+  background: var(--paper); border-bottom: 1px solid transparent; transition: border-color .3s;
 }
 .header.is-scrolled { border-bottom-color: var(--line); }
 .header-inner { height: var(--header); display: flex; align-items: center; gap: var(--s3); }
@@ -149,9 +149,7 @@ p { margin: 0; text-wrap: pretty; }
 .brand-name { font-weight: 800; font-stretch: var(--wide); font-size: 18px; letter-spacing: -.01em; white-space: nowrap; }
 
 .nav { display: none; align-items: center; gap: var(--s4); }
-.nav a {
-  position: relative; padding-block: 8px; font-size: 15px; font-weight: 520; text-decoration: none; color: var(--ink-2);
-}
+.nav a { position: relative; padding-block: 8px; font-size: 15px; font-weight: 520; text-decoration: none; color: var(--ink-2); }
 .nav a::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 2px; background: var(--tide);
   transform: scaleX(0); transform-origin: 0 50%; transition: transform .4s var(--ease);
@@ -162,7 +160,6 @@ p { margin: 0; text-wrap: pretty; }
 .header-cta { display: none; min-height: 42px; font-size: 14px; }
 .header-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none; }
 .header-progress span { display: block; height: 100%; background: var(--sun); transform-origin: 0 50%; transform: scaleX(0); }
-
 .menu-toggle {
   min-height: 44px; padding: 0 16px; border-radius: var(--r); border: 1.5px solid var(--ink);
   background: transparent; color: var(--ink); font: 650 15px var(--font); cursor: pointer;
@@ -171,9 +168,7 @@ p { margin: 0; text-wrap: pretty; }
   .nav, .header-phone, .header-cta { display: inline-flex; }
   .menu-toggle { display: none; }
 }
-@media (min-width: 640px) and (max-width: 1099px) {
-  .header-cta { display: inline-flex; }
-}
+@media (min-width: 640px) and (max-width: 1099px) { .header-cta { display: inline-flex; } }
 
 /* menu do celular: folha que sobe de baixo */
 .menu { position: fixed; inset: 0; z-index: 70; pointer-events: none; }
@@ -198,64 +193,68 @@ p { margin: 0; text-wrap: pretty; }
 .menu-close { min-height: 48px; border-radius: var(--r); border: 0; background: var(--ink); color: var(--paper); font: 650 16px var(--font); cursor: pointer; }
 
 /* ==========================================================================
-   Hero
+   Hero: tríptico de vídeos verticais em tela cheia (21st, Scroll-locked
+   video hero). No celular, só o vídeo da extração.
    ========================================================================== */
-.hero { padding-top: calc(var(--header) + var(--s5)); padding-bottom: var(--s6); }
-.hero-grid { display: grid; gap: var(--s5); align-items: center; }
+.hero { position: relative; background: var(--ink); color: var(--paper); }
+.hero-pin {
+  position: relative; overflow: hidden;
+  height: calc(100svh - var(--header) - env(safe-area-inset-top, 0px));
+  min-height: 560px; margin-top: calc(var(--header) + env(safe-area-inset-top, 0px));
+}
+html.motion .hero { height: calc(100svh + 90vh); }
+html.motion .hero-pin { position: sticky; top: calc(var(--header) + env(safe-area-inset-top, 0px)); }
+.hero-tri { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr; }
+.tri { position: relative; margin: 0; overflow: hidden; background: var(--ink-2); }
+.tri video { width: 100%; height: 100%; object-fit: cover; }
+.tri figcaption {
+  position: absolute; left: 12px; top: 12px; z-index: 2;
+  padding: 5px 10px; border-radius: 4px; background: var(--ink); color: var(--paper);
+  font-size: 13px; font-weight: 650;
+}
+.tri-a, .tri-c { display: none; }
 @media (min-width: 900px) {
-  .hero { padding-top: calc(var(--header) + var(--s6)); padding-bottom: var(--s7); }
-  .hero-grid { grid-template-columns: 1.1fr .9fr; gap: var(--s6); }
+  .hero-tri { grid-template-columns: 1fr 1fr 1fr; gap: 3px; background: var(--ink); }
+  .tri-a, .tri-c { display: block; }
 }
-.hero-copy { display: grid; gap: var(--s4); min-width: 0; align-content: center; }
-.hero-title { font-size: clamp(40px, 5.4vw, 74px); line-height: .98; max-width: 14ch; }
-.hero-lead { font-size: clamp(17px, 1.5vw, 20px); color: var(--ink-2); max-width: 44ch; }
+/* faixa escura embaixo, só para o texto ficar legível em cima do vídeo */
+.hero-pin::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to top, rgba(14, 34, 54, .92) 0%, rgba(14, 34, 54, .7) 34%, rgba(14, 34, 54, 0) 62%);
+}
+.hero-copy {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  display: grid; gap: var(--s3); padding-bottom: var(--s5);
+}
+.hero-title { font-size: clamp(36px, 5.2vw, 72px); line-height: .98; max-width: 15ch; }
+.hero-lead { font-size: clamp(16px, 1.4vw, 19px); color: #dce7ee; max-width: 46ch; }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s4); margin-top: var(--s2); }
-.hero-phone { color: var(--muted); }
-.hero-phone a { color: var(--ink); font-weight: 650; text-decoration-thickness: 1.5px; text-underline-offset: 3px; font-variant-numeric: tabular-nums; }
-.hero-who { font-size: 15px; color: var(--muted); padding-top: var(--s3); border-top: 1px solid var(--line); }
-.hero-who a { color: var(--ink); }
+.hero-phone { color: #dce7ee; }
+.hero-phone a { color: var(--paper); font-weight: 650; text-decoration-thickness: 1.5px; text-underline-offset: 3px; font-variant-numeric: tabular-nums; }
+.hero-hint {
+  position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: var(--s5); z-index: 2;
+  display: none; font-size: 14px; color: #dce7ee;
+}
+html.motion .hero-hint { display: block; }
+@media (max-width: 899px) { html.motion .hero-hint { display: none; } }
 
 /* ==========================================================================
-   Antes e depois (o divisor é o bico do extrator)
-   ========================================================================== */
-.compare { margin: 0; }
-.compare-hero { width: min(100%, 470px); justify-self: center; }
-.compare-box {
-  position: relative; aspect-ratio: 4 / 5; max-width: 100%;
-  border-radius: var(--r); overflow: hidden; background: var(--paper-2);
-  touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: ew-resize;
-}
-.compare-box > img, .compare-before img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.compare-before { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
-.compare-line {
-  position: absolute; top: 0; bottom: 0; left: var(--pos); width: 0; z-index: 2;
-  border-left: 3px solid var(--paper);
-}
-.compare-bico {
-  position: absolute; top: 50%; left: -1.5px; width: 34px; height: 102px;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 4px 8px rgba(14, 34, 54, .35));
-}
-.tag-before { left: 12px; top: 12px; }
-.tag-after { right: 12px; top: 12px; background: var(--sun); color: var(--ink); }
-.compare-range {
-  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; z-index: 4;
-  opacity: 0; pointer-events: none; -webkit-appearance: none; appearance: none;
-}
-.compare-box:focus-within { outline: 2px solid var(--tide); outline-offset: 3px; }
-.compare figcaption { margin-top: 12px; font-size: 15px; color: var(--muted); }
-
-/* ==========================================================================
-   Como é feito: etapas presas na tela, vídeo trocando por etapa
+   Como é feito: etapas presas na tela; a mangueira se desenha com a rolagem
+   (Skiper, SVG Follow Scroll)
    ========================================================================== */
 .como { background: var(--paper-2); }
 .como-sticky { display: grid; gap: var(--s5); padding-block: var(--s7); }
-@media (min-width: 900px) {
-  .como-sticky { grid-template-columns: 1fr minmax(0, 420px); gap: var(--s6); align-items: center; }
-}
+@media (min-width: 900px) { .como-sticky { grid-template-columns: 1fr minmax(0, 420px); gap: var(--s6); align-items: center; } }
 .como-side { display: grid; gap: var(--s4); align-content: start; min-width: 0; }
-.etapas { list-style: none; margin: var(--s3) 0 0; padding: 0; display: grid; border-top: 1px solid var(--line); }
+.etapas-wrap { position: relative; padding-left: 44px; margin-top: var(--s3); }
+.mangueira { position: absolute; left: 0; top: 0; width: 44px; height: 100%; overflow: visible; pointer-events: none; }
+.mangueira path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.mangueira-base { stroke: var(--line); stroke-width: 6; }
+.mangueira-agua { stroke: var(--ink); stroke-width: 6; }
+.mangueira-bico { position: absolute; left: 0; top: 0; width: 30px; height: 30px; color: var(--ink); pointer-events: none; transform: translate(-50%, -50%); }
+.etapas { list-style: none; margin: 0; padding: 0; display: grid; }
 .etapa { position: relative; border-bottom: 1px solid var(--line); }
+.etapa:first-child { border-top: 1px solid var(--line); }
 .etapa-btn {
   display: flex; align-items: baseline; gap: var(--s3); width: 100%;
   padding: var(--s3) 0; border: 0; background: none; color: var(--muted);
@@ -266,13 +265,9 @@ p { margin: 0; text-wrap: pretty; }
 .etapa.is-active .etapa-btn { color: var(--ink); }
 .etapa.is-active .etapa-num { color: var(--tide); }
 .etapa-texto { color: var(--ink-2); padding: 0 0 var(--s3) calc(1.2em + var(--s3)); max-width: 44ch; }
-.etapa-barra { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
-.etapa-barra span { display: block; height: 100%; background: var(--tide); transform-origin: 0 50%; transform: scaleX(0); }
 .como-media { position: relative; aspect-ratio: 4 / 5; max-width: 100%; border-radius: var(--r); overflow: hidden; background: var(--ink); }
 .como-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s; }
 .como-media video.is-active { opacity: 1; }
-
-/* com movimento: a seção vira uma pista e o conteúdo fica preso na tela */
 html.motion .como-track { height: 400vh; }
 html.motion .como-sticky { position: sticky; top: calc(var(--header) + env(safe-area-inset-top, 0px)); min-height: calc(100vh - var(--header)); align-content: center; padding-block: var(--s5); }
 html.motion .etapa:not(.is-active) .etapa-texto { display: none; }
@@ -280,111 +275,169 @@ html.motion .etapa:not(.is-active) .etapa-texto { display: none; }
   html.motion .como-sticky { gap: var(--s3); padding-block: var(--s4); }
   html.motion .como-side { gap: var(--s3); }
   html.motion .como-side .sec-lead { display: none; }
-  html.motion .como-media { order: -1; aspect-ratio: auto; height: 38vh; }
+  html.motion .como-media { order: -1; aspect-ratio: auto; height: 36vh; }
   .etapa-btn { padding: 10px 0; }
 }
 
 /* ==========================================================================
-   A água
+   A água: título com a própria água por dentro das letras (React Bits,
+   Masked Heading) e vídeo que ondula sob o dedo (React Bits, Ripple Distortion)
    ========================================================================== */
 .agua { background: var(--ink); color: var(--paper); padding-block: var(--s7); }
 .agua-grid { display: grid; gap: var(--s5); align-items: center; }
-@media (min-width: 900px) { .agua-grid { grid-template-columns: minmax(0, 360px) 1fr; gap: var(--s6); } }
-.agua-video { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); }
+@media (min-width: 900px) { .agua-grid { grid-template-columns: minmax(0, 380px) 1fr; gap: var(--s6); } }
+.agua-media { position: relative; aspect-ratio: 4 / 5; max-width: 100%; border-radius: var(--r); overflow: hidden; background: var(--ink-2); touch-action: pan-y; }
+.agua-video, .agua-canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.agua-canvas { opacity: 0; transition: opacity .4s; }
+.agua-media.is-gl .agua-canvas { opacity: 1; }
+.agua-dica { position: absolute; left: 12px; bottom: 12px; padding: 5px 10px; border-radius: 4px; background: var(--ink); color: var(--paper); font-size: 13px; font-weight: 650; display: none; }
+.agua-media.is-gl .agua-dica { display: block; }
 .agua-copy { display: grid; gap: var(--s4); min-width: 0; }
-.agua-big { font-size: clamp(32px, 4.4vw, 58px); line-height: 1.02; max-width: 18ch; }
+.agua-big { font-size: clamp(36px, 5.2vw, 72px); line-height: 1; max-width: 16ch; font-weight: 820; }
+.agua-big.is-masked {
+  color: transparent;
+  background: url("../assets/media/agua-textura.webp") 50% 40% / 140% auto;
+  -webkit-background-clip: text; background-clip: text;
+}
 .agua-small { color: var(--muted-light); font-size: 18px; max-width: 40ch; }
 
 /* ==========================================================================
-   Antes e depois
+   Antes e depois: a bolha de sabão mostra o limpo por baixo (Bencho, Glass Bubble)
    ========================================================================== */
 .ad { padding-block: var(--s7); }
 .ad-head { display: grid; gap: var(--s3); margin-bottom: var(--s5); }
 @media (min-width: 900px) { .ad-head { grid-template-columns: 1fr 1fr; align-items: end; gap: var(--s6); } }
 .ad-grid { display: grid; gap: var(--s4); }
-@media (min-width: 700px) { .ad-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 700px) { .ad-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.bolha { --raio: 26%; --rw: 1.132; margin: 0; } /* --rw: o raio do recorte é medido na diagonal da foto 4:5 */
+.bolha-box {
+  position: relative; aspect-ratio: 4 / 5; max-width: 100%; border-radius: var(--r); overflow: hidden;
+  background: var(--paper-2); cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+}
+.bolha-box.is-dragging { cursor: grabbing; }
+.bolha-box > img, .bolha-depois img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.bolha-depois { position: absolute; inset: 0; clip-path: circle(var(--raio) at var(--x) var(--y)); }
+.bolha-depois img { transform-origin: var(--x) var(--y); transform: scale(1.04); }
+.bolha-anel {
+  position: absolute; z-index: 2; left: var(--x); top: var(--y);
+  width: calc(var(--raio) * 2 * var(--rw)); aspect-ratio: 1; border-radius: 50%;
+  transform: translate(-50%, -50%); pointer-events: none;
+  /* borda de bolha: brilho no alto e um leve tom azulado e amarelo na borda */
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .85), inset 6px -10px 18px rgba(31, 111, 168, .35), inset -8px 10px 16px rgba(255, 200, 61, .3), 0 6px 18px rgba(14, 34, 54, .3);
+  touch-action: none;
+}
+.bolha-anel::before {
+  content: ""; position: absolute; left: 22%; top: 14%; width: 22%; height: 12%; border-radius: 50%;
+  background: rgba(255, 255, 255, .85); transform: rotate(-30deg);
+}
+.bolha-anel span {
+  position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%);
+  padding: 3px 8px; border-radius: 4px; background: var(--sun); color: var(--ink);
+  font-size: 12px; font-weight: 700; white-space: nowrap;
+}
+.bolha.is-full .bolha-anel { opacity: 0; transition: opacity .3s; }
+.tag-before { left: 12px; top: 12px; }
+.bolha figcaption { margin-top: 12px; display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); font-size: 15px; color: var(--muted); }
+.bolha-ver { border: 0; background: none; padding: 6px 0; color: var(--ink); font: 650 14px var(--font); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
+.bolha-box:focus-visible { outline: 2px solid var(--tide); outline-offset: 3px; }
 
 /* ==========================================================================
-   Serviços: a linha abre e mostra a foto
+   Serviços: sanfona de fotos (React Bits, Accordion Gallery)
    ========================================================================== */
 .servicos { padding-block: var(--s6) var(--s7); }
 .servicos .sec-title { margin-bottom: var(--s5); }
-.svc-list { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
-.svc-list li { border-bottom: 1px solid var(--line); }
-.svc {
-  display: grid; grid-template-columns: 1fr 72px; grid-template-rows: auto auto; gap: 4px var(--s3);
-  align-items: center; padding: var(--s3) 0; text-decoration: none;
-}
-.svc-name { font-stretch: var(--wide); font-weight: 760; font-size: clamp(30px, 5vw, 64px); line-height: 1; letter-spacing: -.01em; transition: color .3s; }
-.svc-desc { grid-column: 1; color: var(--muted); font-size: 16px; max-width: 46ch; }
-.svc-img { grid-column: 2; grid-row: 1 / span 2; width: 72px; aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; }
-.svc-img img { width: 100%; height: 100%; object-fit: cover; }
+.acc { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.acc-item { position: relative; border-radius: var(--r); overflow: hidden; background: var(--ink); height: 76px; transition: height .6s var(--ease); }
+.acc-item.is-open { height: 340px; }
+.acc-item a { position: absolute; inset: 0; display: block; color: var(--paper); text-decoration: none; }
+.acc-item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; transition: opacity .5s, transform .8s var(--ease); transform: scale(1.08); }
+.acc-item.is-open img { opacity: 1; transform: scale(1); }
+.acc-item a::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(14, 34, 54, .88), rgba(14, 34, 54, 0) 60%); }
+.acc-txt { position: absolute; left: var(--s3); right: var(--s3); bottom: var(--s3); z-index: 1; display: grid; gap: 4px; }
+.acc-nome { font-stretch: var(--wide); font-weight: 760; font-size: clamp(26px, 3vw, 40px); line-height: 1; }
+.acc-desc { font-size: 15px; color: #dce7ee; max-width: 34ch; opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .4s; }
+.acc-item.is-open .acc-desc { opacity: 1; transform: none; transition-delay: .2s; }
+.acc-item:not(.is-open) .acc-desc { position: absolute; }
 @media (min-width: 900px) {
-  .svc { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; grid-template-rows: auto; padding: var(--s4) 0; }
-  .svc-desc { grid-column: 2; }
-  .svc-img { grid-column: 3; grid-row: 1; width: 80px; height: 100px; aspect-ratio: auto; transition: width .5s var(--ease), height .5s var(--ease); }
-  .svc:hover .svc-img, .svc:focus-visible .svc-img { width: 150px; height: 120px; }
-  .svc:hover .svc-name { color: var(--tide); }
+  .acc { flex-direction: row; height: 520px; }
+  .acc-item, .acc-item.is-open { height: auto; flex: 1 1 0; transition: flex-grow .7s var(--ease); min-width: 0; }
+  .acc-item.is-open { flex-grow: 4.2; }
+  .acc-item:not(.is-open) .acc-nome { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 26px; }
+  .acc-txt { left: var(--s4); bottom: var(--s4); }
 }
 
 /* ==========================================================================
-   Empresas
+   Empresas: ordem de serviço (21st, Delivery Progress)
    ========================================================================== */
-.empresas { background: var(--ink); color: var(--paper); padding-block: var(--s7); }
+.empresas { background: var(--ink); color: var(--paper); padding-block: var(--s7); overflow: hidden; }
 .empresas-grid { display: grid; gap: var(--s5); align-items: center; }
-@media (min-width: 900px) { .empresas-grid { grid-template-columns: 1fr 1fr; gap: var(--s6); } }
+@media (min-width: 900px) { .empresas-grid { grid-template-columns: 1.05fr 1fr; gap: var(--s6); } }
 .empresas-copy { display: grid; gap: var(--s4); justify-items: start; min-width: 0; }
-.empresas-copy p { color: var(--muted-light); max-width: 46ch; }
-.empresas-copy p:first-of-type { color: var(--paper); font-size: 19px; }
+.empresas-copy > p { color: #dce7ee; max-width: 46ch; font-size: 18px; }
+.empresas-copy .empresas-nota { color: var(--muted-light); font-size: 16px; }
+.os {
+  position: relative; width: 100%; max-width: 460px;
+  border: 1.5px solid var(--line-light); border-radius: var(--r); padding: var(--s4);
+  background: var(--ink-2);
+}
+.os-topo { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); font-size: 13px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-light); }
+.os-status { padding: 3px 8px; border-radius: 4px; background: var(--sun); color: var(--ink); letter-spacing: .02em; }
+.os-cliente { margin: 8px 0 var(--s4); font-stretch: var(--wide); font-weight: 720; font-size: 19px; }
+.os-etapas { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); position: relative; z-index: 1; }
+.os-etapas li { display: flex; align-items: center; gap: 12px; font-size: 16px; }
+.os-check { width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--tide); color: var(--paper); }
+.os-check svg { width: 16px; height: 16px; }
+.os-linha { position: absolute; left: calc(var(--s4) + 12px); width: 2px; top: var(--os-top, 120px); bottom: var(--os-bottom, 36px); background: var(--line-light); }
+.os-linha span { display: block; width: 100%; height: 100%; background: var(--tide); transform-origin: 50% 0; }
 .empresas-media { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--s3); align-items: end; }
 .empresas-media figure { margin: 0; border-radius: var(--r); overflow: hidden; aspect-ratio: 4 / 5; max-width: 100%; }
 .empresas-media img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ==========================================================================
-   Quem faz
+   Quem faz: foto que inclina com o cursor (React Bits, Tilted Card)
    ========================================================================== */
 .quem { padding-block: var(--s7); }
 .quem-grid { display: grid; gap: var(--s5); align-items: end; }
-@media (min-width: 900px) { .quem-grid { grid-template-columns: 1.3fr .7fr .45fr; gap: var(--s5); } }
+@media (min-width: 900px) { .quem-grid { grid-template-columns: 1.3fr .75fr .45fr; gap: var(--s5); } }
 .quem-grid figure { margin: 0; }
-.quem-grid figure img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); }
-.quem-grid figcaption { margin-top: 10px; font-size: 14px; color: var(--muted); }
 .quem-copy { display: grid; gap: var(--s4); justify-items: start; min-width: 0; align-self: center; }
 .quem-copy p { color: var(--ink-2); max-width: 44ch; }
+.quem-card { perspective: 900px; }
+.quem-tilt { position: relative; transform-style: preserve-3d; will-change: transform; }
+.quem-tilt img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); }
+.quem-legenda {
+  position: absolute; left: 14px; bottom: 14px; transform: translateZ(40px);
+  display: grid; padding: 8px 12px; border-radius: 4px; background: var(--paper); color: var(--ink);
+  box-shadow: 0 8px 20px -8px rgba(14, 34, 54, .5);
+}
+.quem-legenda strong { font-stretch: var(--wide); font-size: 16px; }
+.quem-legenda span { font-size: 13px; color: var(--muted); }
+.quem-side img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); }
+.quem-side figcaption { margin-top: 10px; font-size: 14px; color: var(--muted); }
 .quem-side { display: none; }
 @media (min-width: 900px) { .quem-side { display: block; } }
 
 /* ==========================================================================
-   Galeria: faixa pra arrastar
+   Galeria: parede infinita pra arrastar (21st, Infinite Drag Scroll)
    ========================================================================== */
-.galeria { padding-block: var(--s6) var(--s7); background: var(--paper-2); }
-.gal-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s3) var(--s4); margin-bottom: var(--s5); }
-.gal-nav { display: flex; gap: var(--s2); }
-.gal-btn {
-  width: 48px; height: 48px; border-radius: var(--r); border: 1.5px solid var(--ink);
-  background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center;
-  transition: background .25s, color .25s;
-}
-.gal-btn svg { width: 22px; height: 22px; }
-.gal-btn:hover { background: var(--ink); color: var(--paper); }
-.gal {
-  list-style: none; margin: 0; display: flex; gap: var(--s3);
-  overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-  padding-block: 0 var(--s2);
-  padding-inline: max(16px, calc((100vw - 1200px) / 2 + 32px));
-  scroll-padding-inline: max(16px, calc((100vw - 1200px) / 2 + 32px));
-  cursor: grab;
-}
-.gal::-webkit-scrollbar { display: none; }
-.gal.is-dragging { cursor: grabbing; scroll-snap-type: none; }
-.gal li { flex: 0 0 clamp(220px, 24vw, 300px); scroll-snap-align: start; }
-.gal figure { margin: 0; }
-.gal img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); pointer-events: none; user-select: none; }
-.gal figcaption { margin-top: 10px; font-size: 15px; font-weight: 520; }
-@media (max-width: 759px) { .gal { padding-inline: 16px; scroll-padding-inline: 16px; } .gal li { flex-basis: 72%; } }
+.galeria { padding-block: var(--s6) var(--s7); background: var(--paper-2); overflow: hidden; }
+.gal-head { display: grid; gap: var(--s3); margin-bottom: var(--s5); }
+@media (min-width: 900px) { .gal-head { grid-template-columns: 1fr 1fr; align-items: end; gap: var(--s6); } }
+.inf { display: none; position: relative; height: min(76vh, 720px); overflow: hidden; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.inf.is-dragging { cursor: grabbing; }
+.inf-stage { position: absolute; inset: 0; }
+.inf-tile { position: absolute; left: 0; top: 0; margin: 0; will-change: transform; }
+.inf-tile img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); pointer-events: none; }
+.inf-tile figcaption { margin-top: 8px; font-size: 14px; font-weight: 520; }
+html.js .inf { display: block; }
+html.js .gal-lista { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.gal-lista { list-style: none; margin: 0; padding: 0 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+.gal-lista figure { margin: 0; }
+.gal-lista img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r); }
+.gal-lista figcaption { margin-top: 8px; font-size: 14px; }
 
 /* ==========================================================================
-   Orçamento: ficha
+   Orçamento: ficha; enviar é arrastar o bico (Bencho, Slide to Confirm)
    ========================================================================== */
 .orcamento { padding-block: var(--s7); }
 .orc-grid { display: grid; gap: var(--s5); }
@@ -392,12 +445,7 @@ html.motion .etapa:not(.is-active) .etapa-texto { display: none; }
 .orc-copy { display: grid; gap: var(--s4); min-width: 0; }
 .orc-copy p { color: var(--ink-2); max-width: 42ch; }
 .orc-direto a { font-weight: 650; font-variant-numeric: tabular-nums; }
-
-.ficha {
-  position: relative; display: grid; gap: var(--s4);
-  padding: var(--s4); border: 1.5px solid var(--ink); border-radius: var(--r);
-  background: #fff;
-}
+.ficha { position: relative; display: grid; gap: var(--s4); padding: var(--s4); border: 1.5px solid var(--ink); border-radius: var(--r); background: #fff; }
 @media (min-width: 600px) { .ficha { padding: var(--s5); } }
 .ficha-topo {
   display: flex; justify-content: space-between; gap: var(--s3); flex-wrap: wrap;
@@ -424,16 +472,34 @@ html.motion .etapa:not(.is-active) .etapa-texto { display: none; }
 @media (min-width: 560px) { .field-row { grid-template-columns: 1fr 1fr; } }
 .field input {
   height: 48px; padding: 0 2px; border: 0; border-bottom: 1.5px solid var(--line); border-radius: 0;
-  background: transparent; color: var(--ink); font: 17px var(--font); width: 100%;
-  transition: border-color .2s;
+  background: transparent; color: var(--ink); font: 17px var(--font); width: 100%; transition: border-color .2s;
 }
 .field input::placeholder { color: #7f91a0; }
 .field input:focus { outline: none; border-bottom-color: var(--tide); }
 .field:focus-within label { color: var(--tide); }
 .ficha-erro { color: #a1261c; font-weight: 650; font-size: 15px; }
 .ficha-ok { color: var(--ink-2); font-size: 15px; }
-.ficha-enviar { justify-self: start; max-width: 100%; }
-@media (max-width: 420px) { .ficha-enviar { justify-self: stretch; justify-content: center; padding-inline: 16px; font-size: 15px; } }
+
+.desliza {
+  --x: 0px;
+  position: relative; height: 64px; border-radius: var(--r); overflow: hidden;
+  background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--line);
+  touch-action: pan-y;
+}
+.desliza-agua { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--x) + 32px); background: var(--sun); }
+.desliza-texto {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 0 16px 0 72px;
+  font-weight: 650; font-size: 15px; color: var(--ink); text-align: center; pointer-events: none;
+}
+.desliza-bico {
+  position: absolute; left: 4px; top: 4px; bottom: 4px; width: 56px;
+  display: grid; place-items: center; border: 0; border-radius: 4px;
+  background: var(--ink); color: var(--paper); cursor: grab; touch-action: none;
+  transform: translateX(var(--x));
+}
+.desliza-bico svg { width: 30px; height: 30px; transform: rotate(90deg); color: var(--paper); }
+.desliza-bico:active { cursor: grabbing; }
+.desliza.is-done .desliza-texto { opacity: 0; }
 
 /* bolhas do envio (as mesmas da marca) */
 .pop {
@@ -443,18 +509,19 @@ html.motion .etapa:not(.is-active) .etapa-texto { display: none; }
 }
 
 /* ==========================================================================
-   Rodapé
+   Rodapé: o telefone reage ao cursor (React Bits, Text Pressure)
    ========================================================================== */
 .footer { background: var(--ink); color: var(--paper); padding-block: var(--s6) calc(var(--s4) + env(safe-area-inset-bottom, 0px)); }
 .footer-grid { display: grid; gap: var(--s5); padding-bottom: var(--s5); }
 .footer-grid > * { min-width: 0; }
-@media (min-width: 900px) { .footer-grid { grid-template-columns: 1.4fr 1fr; align-items: end; } }
+@media (min-width: 1100px) { .footer-grid { grid-template-columns: 1.5fr 1fr; align-items: end; } }
 .footer-label { font-size: 14px; color: var(--muted-light); }
 .footer-phone {
   display: inline-block; margin: 6px 0 10px; text-decoration: none;
-  font-stretch: var(--wide); font-weight: 780; font-size: clamp(28px, 8.4vw, 92px); line-height: 1;
+  font-stretch: var(--wide); font-weight: 780; font-size: clamp(28px, 6.2vw, 74px); line-height: 1;
   letter-spacing: -.01em; font-variant-numeric: tabular-nums;
 }
+.footer-phone .ch { display: inline-block; transition: color .3s; }
 .footer-phone:hover { color: var(--sun); }
 .footer-contato p:last-child { color: var(--muted-light); }
 .footer-info { display: grid; gap: var(--s3); color: var(--muted-light); font-size: 15px; }
